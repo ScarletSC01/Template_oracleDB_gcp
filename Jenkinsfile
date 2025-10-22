@@ -424,14 +424,51 @@ pipeline {
 
         stage('Terraform Action') {
             steps {
-                withCredentials(["GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDENTIALS}"]) {
+                withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                     script {
-                        def autoApprove = (params.ACTION == 'apply') ? '-auto-approve' : ''
-                        sh """
-                        terraform ${params.ACTION} ${autoApprove} \
-                        -var='project_id=${params.PROJECT_ID}' \
-                        -var='region=${params.REGION}'
-                        """
+                        def tfVars = [
+                            "project_id=${params.PROJECT_ID}",
+                            "region=${params.REGION}",
+                            "zone=${params.ZONE}",
+                            "db_version=${params.DB_VERSION}",
+                            "db_name=${params.DB_NAME}",
+                            "machine_type=${params.MACHINE_TYPE}",
+                            "db_storage_size=${params.DB_STORAGE_SIZE}",
+                            "vpc_network=${params.VPC_NETWORK}",
+                            "subnet=${params.SUBNET}"
+                        ].join(' -var=\'')
+
+                        switch(params.ACTION) {
+                            case 'plan':
+                                echo '==== Ejecutando Terraform Plan ===='
+                                sh """
+                                    terraform plan -out=tfplan \
+                                    -var='${tfVars}'
+                                """
+                                break
+                                
+                            case 'apply':
+                                echo '==== Ejecutando Terraform Apply ===='
+                                sh """
+                                    terraform apply -auto-approve \
+                                    -var='${tfVars}'
+                                """
+                                break
+                                
+                            case 'distroy':
+                                echo '==== Ejecutando Terraform Destroy ===='
+                                if (params.CHECK_DELETE == 'true') {
+                                    input message: '¿Está seguro de que desea destruir la infraestructura?'
+                                }
+                                sh """
+                                    terraform destroy -auto-approve \
+                                    -var='${tfVars}'
+                                """
+                                break
+                                
+                            default:
+                                error "Acción '${params.ACTION}' no reconocida"
+                        }
                     }
                 }
             }
