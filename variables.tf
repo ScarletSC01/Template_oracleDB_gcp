@@ -250,12 +250,3 @@ variable "check_delete" {
   description = "Habilitar verificación antes de eliminar recursos"
   type        = bool
 }
-
-variable "action" {
-  description = "Acción a seguir"
-  type        = string
-  validation {
-    condition     = contains(["plan", "apply", "destroy"], var.action)
-    error_message = "acción no válida. Usa 'plan', 'apply', 'destroy'."
-  }
-}
