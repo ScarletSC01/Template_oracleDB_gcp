@@ -2,6 +2,7 @@ pipeline {
     agent any
     
     environment {
+        GCP_CREDENTIALS = credentials('gcp-sa-platform')
         // Configuración del país y proveedor
         PAIS = 'CL'
         DB_SERVICE_PROVIDER = 'GCP - Cloud SQL'
@@ -418,15 +419,16 @@ pipeline {
             steps {
                 script {
                     sh """
-                    gcloud sql instances create ${params.DB_NAME} 
-                    --database-version=ORACLE_${params.DB_VERSION}  
-                    --tier=${params.MACHINE_TYPE}    
-                    --region=${params.REGION}
-                    --storage-size=${params.DB_STORAGE_SIZE}
-                    --storage-type=${params.DB_STORAGE_TYPE} 
-                    --root-password=${params.DB_PASSWORD} 
-                    --network=${params.VPC_NETWORK}                                                                                                                  --no-assign-ip=${params.DB_PRIVATE_IP_ENABLED == 'true' ? 'true' : 'false'}
-                    --backup-start-time=${params.DB_BACKUP_START_TIME}
+                    gcloud sql instances create ${params.DB_NAME} \
+                    --database-version=ORACLE_${params.DB_VERSION} \
+                    --tier=${params.MACHINE_TYPE}\
+                    --region=${params.REGION}\
+                    --storage-size=${params.DB_STORAGE_SIZE}\
+                    --storage-type=${params.DB_STORAGE_TYPE} \
+                    --root-password=${params.DB_PASSWORD} \
+                    --network=${params.VPC_NETWORK} \
+                    --no-assign-ip=${params.DB_PRIVATE_IP_ENABLED == 'true' ? 'true' : 'false'}\
+                    --backup-start-time=${params.DB_BACKUP_START_TIME}\
                     """
                 }
             }
