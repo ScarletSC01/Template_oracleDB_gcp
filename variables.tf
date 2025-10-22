@@ -251,7 +251,7 @@ variable "check_delete" {
   type        = bool
 }
 
-variable "ACTION" {
+variable "action" {
   description = "Acción a seguir"
   type        = string
   validation {
