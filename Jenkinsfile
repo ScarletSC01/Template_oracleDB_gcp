@@ -32,17 +32,17 @@ pipeline {
         // ========================================
         string(
             name: 'PROJECT_ID', 
-            defaultValue: '', 
+            defaultValue: 'jenkins-terraform-demo-472920', 
             description: 'ID del proyecto en Google Cloud Platform'
         )
         string(
             name: 'REGION', 
-            defaultValue: '', 
+            defaultValue: 'us-central1', 
             description: 'Región de GCP (ejemplo: us-central1, southamerica-west1)'
         )
         string(
             name: 'ZONE', 
-            defaultValue: '', 
+            defaultValue: 'us-central1-a', 
             description: 'Zona de disponibilidad (ejemplo: us-central1-a)'
         )
         choice(
@@ -61,12 +61,12 @@ pipeline {
         )
         string(
             name: 'DB_NAME', 
-            defaultValue: '', 
+            defaultValue: 'orcl', 
             description: 'Nombre de la base de datos'
         )
         string(
             name: 'DB_SID', 
-            defaultValue: '', 
+            defaultValue: 'ORCL', 
             description: 'System Identifier (SID) de Oracle'
         )
         string(
@@ -76,12 +76,12 @@ pipeline {
         )
         string(
             name: 'DB_USERNAME', 
-            defaultValue: '', 
+            defaultValue: 'admin', 
             description: 'Usuario de la base de datos'
         )
         string(
             name: 'DB_PASSWORD', 
-            defaultValue: '', 
+            defaultValue: 'SuperSecreta123', 
             description: 'Contraseña del usuario de la base de datos'
         )
         string(
@@ -134,7 +134,7 @@ pipeline {
         )
         string(
             name: 'OS_IMAGE', 
-            defaultValue: '', 
+            defaultValue: 'projects/oracle-cloud/global/images/oracle-db-19c', 
             description: 'Imagen del sistema operativo'
         )
         
@@ -148,7 +148,7 @@ pipeline {
         )
         string(
             name: 'SUBNET', 
-            defaultValue: '', 
+            defaultValue: 'default', 
             description: 'Subred dentro de la VPC'
         )
         choice(
@@ -187,7 +187,7 @@ pipeline {
         )
         string(
             name: 'IAM_ROLE', 
-            defaultValue: '', 
+            defaultValue: 'terraform-sa@jenkins-terraform-demo-472920.iam.gserviceaccount.com', 
             description: 'Rol de IAM para la instancia de base de datos'
         )
         choice(
