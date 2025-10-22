@@ -1,105 +1,104 @@
 pipeline {
     agent any
-
+    
     environment {
-        GCP_CREDENTIALS = credentials('gcp-sa-platform')
         // Configuración del país y proveedor
         PAIS = 'CL'
         DB_SERVICE_PROVIDER = 'GCP - Cloud SQL'
         DB_ENGINE = 'OracleSQL'
-       
+        
         // Configuración de backup y zona horaria
         DB_BACKUP_ENABLED = 'true'
         DB_TIME_ZONE = 'UTC-0'
-       
+        
         // Etiquetas y tags
         DB_RESOURCE_LABELS = 'test'
         DB_TAGS = 'test'
-       
+        
         // Credenciales de plataforma
         DB_PLATFORM_USER = 'Equipo_plataforma'
         DB_PLATFORM_PASS = 'password'
-       
+        
         // Credenciales de administrador
         DB_USER_ADMIN = 'OracleSQL'
         DB_PASSWORD_ADMIN = 'password'
     }
-
+    
     parameters {
         // ========================================
         // CONFIGURACIÓN DE PROYECTO GCP
         // ========================================
         string(
-            name: 'PROJECT_ID',
-            defaultValue: '',
+            name: 'PROJECT_ID', 
+            defaultValue: '', 
             description: 'ID del proyecto en Google Cloud Platform'
         )
         string(
-            name: 'REGION',
-            defaultValue: '',
+            name: 'REGION', 
+            defaultValue: '', 
             description: 'Región de GCP (ejemplo: us-central1, southamerica-west1)'
         )
         string(
-            name: 'ZONE',
-            defaultValue: '',
+            name: 'ZONE', 
+            defaultValue: '', 
             description: 'Zona de disponibilidad (ejemplo: us-central1-a)'
         )
         choice(
-            name: 'ENVIRONMENT',
-            choices: ['desarrollo', 'pre productivo', 'productivo'],
+            name: 'ENVIRONMENT', 
+            choices: ['desarrollo', 'pre productivo', 'productivo'], 
             description: 'Ambiente de despliegue'
         )
-       
+        
         // ========================================
         // CONFIGURACIÓN DE BASE DE DATOS
         // ========================================
         choice(
-            name: 'DB_VERSION',
-            choices: ['19c', '12c', '11g'],
+            name: 'DB_VERSION', 
+            choices: ['19c', '12c', '11g'], 
             description: 'Versión de Oracle Database'
         )
         string(
-            name: 'DB_NAME',
-            defaultValue: '',
+            name: 'DB_NAME', 
+            defaultValue: '', 
             description: 'Nombre de la base de datos'
         )
         string(
-            name: 'DB_SID',
-            defaultValue: '',
+            name: 'DB_SID', 
+            defaultValue: '', 
             description: 'System Identifier (SID) de Oracle'
         )
         string(
-            name: 'DB_CHARACTER_SET',
-            defaultValue: 'AL32UTF8',
+            name: 'DB_CHARACTER_SET', 
+            defaultValue: 'AL32UTF8', 
             description: 'Character Set de la base de datos (ejemplo: AL32UTF8, WE8ISO8859P1)'
         )
         string(
-            name: 'DB_USERNAME',
-            defaultValue: '',
+            name: 'DB_USERNAME', 
+            defaultValue: '', 
             description: 'Usuario de la base de datos'
         )
         string(
-            name: 'DB_PASSWORD',
-            defaultValue: '',
+            name: 'DB_PASSWORD', 
+            defaultValue: '', 
             description: 'Contraseña del usuario de la base de datos'
         )
         string(
-            name: 'DB_MAX_CONNECTIONS',
-            defaultValue: '100',
+            name: 'DB_MAX_CONNECTIONS', 
+            defaultValue: '100', 
             description: 'Número máximo de conexiones concurrentes'
         )
         choice(
-            name: 'ENABLE_CACHE',
-            choices: ['false', 'true'],
+            name: 'ENABLE_CACHE', 
+            choices: ['false', 'true'], 
             description: 'Habilitar cache de datos en la base de datos'
         )
-
+        
         // ========================================
         // CONFIGURACIÓN DE RECURSOS DE CÓMPUTO
         // ========================================
         choice(
-            name: 'MACHINE_TYPE',
-            choices: ['db-n2-highmem-8', 'db-n1-standard-4', 'db-custom-2-3840'],
+            name: 'MACHINE_TYPE', 
+            choices: ['db-n2-highmem-8', 'db-n1-standard-4', 'db-custom-2-3840'], 
             description: 'Tipo de máquina virtual'
         )
         
@@ -107,109 +106,160 @@ pipeline {
         // CONFIGURACIÓN DE ALMACENAMIENTO
         // ========================================
         string(
-            name: 'DB_STORAGE_SIZE',
-            defaultValue: '100',
+            name: 'DB_STORAGE_SIZE', 
+            defaultValue: '100', 
             description: 'Tamaño del almacenamiento en GB'
         )
         choice(
-            name: 'DB_STORAGE_TYPE',
-            choices: ['SSD', 'Balanced', 'HDD'],
+            name: 'DB_STORAGE_TYPE', 
+            choices: ['SSD', 'Balanced', 'HDD'], 
             description: 'Tipo de disco de almacenamiento'
         )
         choice(
-            name: 'DB_STORAGE_AUTO_RESIZE',
-            choices: ['true', 'false'],
+            name: 'DB_STORAGE_AUTO_RESIZE', 
+            choices: ['true', 'false'], 
             description: 'Habilitar redimensionamiento automático del almacenamiento'
         )
         string(
-            name: 'BOOT_DISK_TYPE',
-            defaultValue: 'pd-ssd',
+            name: 'BOOT_DISK_TYPE', 
+            defaultValue: 'pd-ssd', 
             description: 'Tipo de disco de arranque (pd-ssd, pd-standard, pd-balanced)'
         )
         string(
-            name: 'BOOT_DISK_SIZE',
-            defaultValue: '50',
+            name: 'BOOT_DISK_SIZE', 
+            defaultValue: '50', 
             description: 'Tamaño del disco de arranque en GB'
         )
         string(
-            name: 'OS_IMAGE',
-            defaultValue: '',
+            name: 'OS_IMAGE', 
+            defaultValue: '', 
             description: 'Imagen del sistema operativo'
         )
-
+        
         // ========================================
         // CONFIGURACIÓN DE RED
         // ========================================
         string(
-            name: 'VPC_NETWORK',
-            defaultValue: 'default',
+            name: 'VPC_NETWORK', 
+            defaultValue: 'default', 
             description: 'Nombre de la red VPC'
         )
         string(
-            name: 'SUBNET',
-            defaultValue: '',
+            name: 'SUBNET', 
+            defaultValue: '', 
             description: 'Subred dentro de la VPC'
         )
         choice(
-            name: 'DB_PRIVATE_IP_ENABLED',
-            choices: ['true', 'false'],
+            name: 'DB_PRIVATE_IP_ENABLED', 
+            choices: ['true', 'false'], 
             description: 'Habilitar dirección IP privada'
         )
         choice(
-            name: 'DB_PUBLIC_ACCESS_ENABLED',
-            choices: ['false', 'true'],
+            name: 'DB_PUBLIC_ACCESS_ENABLED', 
+            choices: ['false', 'true'], 
             description: 'Habilitar acceso público a la base de datos'
         )
         choice(
-            name: 'DB_IP_RANGE_ALLOWED',
-            choices: ['false', 'true'],
+            name: 'DB_IP_RANGE_ALLOWED', 
+            choices: ['false', 'true'], 
             description: 'Configurar rangos de IP permitidos'
         )
-
+        
         // ========================================
         // CONFIGURACIÓN DE SEGURIDAD
         // ========================================
         choice(
-            name: 'DB_SSL_ENABLED',
-            choices: ['true', 'false'],
+            name: 'DB_SSL_ENABLED', 
+            choices: ['true', 'false'], 
             description: 'Requerir conexiones SSL/TLS'
         )
         choice(
-            name: 'DB_ENCRYPTION_ENABLED',
-            choices: ['true', 'false'],
+            name: 'DB_ENCRYPTION_ENABLED', 
+            choices: ['true', 'false'], 
             description: 'Habilitar encriptación de datos en reposo'
         )
         choice(
-            name: 'DB_DELETION_PROTECTION',
-            choices: ['true', 'false'],
+            name: 'DB_DELETION_PROTECTION', 
+            choices: ['true', 'false'], 
             description: 'Protección contra eliminación accidental'
         )
         string(
-            name: 'IAM_ROLE',
-            defaultValue: '',
+            name: 'IAM_ROLE', 
+            defaultValue: '', 
             description: 'Rol de IAM para la instancia de base de datos'
         )
         choice(
-            name: 'CREDENTIAL_FILE',
-            choices: ['false', 'true'],
+            name: 'CREDENTIAL_FILE', 
+            choices: ['false', 'true'], 
             description: 'Utilizar archivo de credenciales para autenticación'
         )
-
+        
         // ========================================
         // CONFIGURACIÓN DE BACKUP
         // ========================================
         string(
-            name: 'BACKUP_RETENTION_DAYS',
-            defaultValue: '7',
+            name: 'BACKUP_RETENTION_DAYS', 
+            defaultValue: '7', 
             description: 'Días de retención de backups automáticos'
         )
         string(
-            name: 'DB_BACKUP_START_TIME',
-            defaultValue: '02:00',
+            name: 'DB_BACKUP_START_TIME', 
+            defaultValue: '02:00', 
             description: 'Hora de inicio de backup diario (formato HH:MM)'
         )
+        
+        // ========================================
+        // CONFIGURACIÓN DE MANTENIMIENTO
+        // ========================================
+        string(
+            name: 'DB_MAINTENANCE_WINDOW_DAY', 
+            defaultValue: 'sunday', 
+            description: 'Día de la ventana de mantenimiento (ejemplo: sunday, monday)'
+        )
+        choice(
+            name: 'DB_MAINTENANCE_WINDOW_HOUR', 
+            choices: ['02:00', '03:00', '04:00'], 
+            description: 'Hora de inicio de la ventana de mantenimiento'
+        )
+        
+        // ========================================
+        // CONFIGURACIÓN DE MONITOREO
+        // ========================================
+        choice(
+            name: 'DB_MONITORING_ENABLED', 
+            choices: ['true', 'false'], 
+            description: 'Habilitar monitoreo avanzado con Cloud Monitoring'
+        )
+        
+        // ========================================
+        // ALTA DISPONIBILIDAD Y ESCALABILIDAD
+        // ========================================
+        choice(
+            name: 'DB_HIGH_AVAILABILITY', 
+            choices: ['false', 'true'], 
+            description: 'Habilitar configuración de alta disponibilidad (HA)'
+        )
+        choice(
+            name: 'AUTO_SCALE_ENABLED', 
+            choices: ['false', 'true'], 
+            description: 'Habilitar auto escalado de recursos'
+        )
+        string(
+            name: 'DB_LISTENER_CONFIG', 
+            defaultValue: '', 
+            description: 'Configuración personalizada del Oracle Listener'
+        )
+        
+        // ========================================
+        // OPCIONES ADMINISTRATIVAS
+        // ========================================
+        choice(
+            name: 'CHECK_DELETE', 
+            choices: ['false', 'true'], 
+            description: 'Habilitar verificación antes de eliminar recursos'
+        )
     }
-
+    
     stages {
         stage('Validación de Parámetros') {
             steps {
@@ -217,6 +267,7 @@ pipeline {
                     echo '================================================'
                     echo '         VALIDACIÓN DE PARÁMETROS              '
                     echo '================================================'
+                    
                     // Validaciones básicas
                     if (!params.PROJECT_ID?.trim()) {
                         error('ERROR: PROJECT_ID es obligatorio')
@@ -227,80 +278,164 @@ pipeline {
                     if (!params.DB_NAME?.trim()) {
                         error('ERROR: DB_NAME es obligatorio')
                     }
+                    
                     echo 'Validación de parámetros completada exitosamente'
                 }
             }
         }
-
+        
         stage('Mostrar Configuración') {
             steps {
                 script {
+                    def configuracionOculta = [
+                        'País': env.PAIS,
+                        'Proveedor de Servicio': env.DB_SERVICE_PROVIDER,
+                        'Motor de Base de Datos': env.DB_ENGINE,
+                        'Backup Habilitado': env.DB_BACKUP_ENABLED,
+                        'Zona Horaria': env.DB_TIME_ZONE,
+                        'Etiquetas de Recursos': env.DB_RESOURCE_LABELS,
+                        'Tags': env.DB_TAGS,
+                        'Usuario de Plataforma': env.DB_PLATFORM_USER,
+                        'Usuario Administrador': env.DB_USER_ADMIN
+                    ]
+
+                    def configuracionGCP = [
+                        'ID de Proyecto': params.PROJECT_ID,
+                        'Región': params.REGION,
+                        'Zona': params.ZONE,
+                        'Ambiente': params.ENVIRONMENT
+                    ]
+                    
+                    def configuracionBaseDatos = [
+                        'Versión de Oracle': params.DB_VERSION,
+                        'Nombre de BD': params.DB_NAME,
+                        'SID': params.DB_SID,
+                        'Character Set': params.DB_CHARACTER_SET,
+                        'Usuario de BD': params.DB_USERNAME,
+                        'Conexiones Máximas': params.DB_MAX_CONNECTIONS,
+                        'Habilitar cache de datos': params.ENABLE_CACHE
+                    ]
+                    
+                    def configuracionRecursos = [
+                        'Tipo de Máquina': params.MACHINE_TYPE,
+                        'Tamaño de Almacenamiento': "${params.DB_STORAGE_SIZE} GB",
+                        'Tipo de Almacenamiento': params.DB_STORAGE_TYPE,
+                        'Auto Resize': params.DB_STORAGE_AUTO_RESIZE,
+                        'Tipo de Disco de Arranque': params.BOOT_DISK_TYPE,
+                        'Tamaño de Disco de Arranque': "${params.BOOT_DISK_SIZE} GB"
+                    ]
+                    
+                    def configuracionRed = [
+                        'Red VPC': params.VPC_NETWORK,
+                        'Subred': params.SUBNET,
+                        'IP Privada': params.DB_PRIVATE_IP_ENABLED,
+                        'Acceso Público': params.DB_PUBLIC_ACCESS_ENABLED,
+                        'Rangos IP Permitidos': params.DB_IP_RANGE_ALLOWED,
+                        'SSL Habilitado': params.DB_SSL_ENABLED
+                    ]
+                    
+                    def configuracionSeguridad = [
+                        'Encriptación': params.DB_ENCRYPTION_ENABLED,
+                        'Protección contra Eliminación': params.DB_DELETION_PROTECTION,
+                        'Rol IAM': params.IAM_ROLE,
+                        'Archivo de Credenciales': params.CREDENTIAL_FILE
+                    ]
+                    
+                    def configuracionBackup = [
+                        'Días de Retención': params.BACKUP_RETENTION_DAYS,
+                        'Hora de Inicio': params.DB_BACKUP_START_TIME,
+                        'Día de Mantenimiento': params.DB_MAINTENANCE_WINDOW_DAY,
+                        'Hora de Mantenimiento': params.DB_MAINTENANCE_WINDOW_HOUR
+                    ]
+                    
+                    def configuracionAltaDisponibilidad = [
+                        'Alta Disponibilidad': params.DB_HIGH_AVAILABILITY,
+                        'Auto Escalado': params.AUTO_SCALE_ENABLED,
+                        'Monitoreo Avanzado': params.DB_MONITORING_ENABLED,
+                        'Configuración de Listener': params.DB_LISTENER_CONFIG
+                    ]
+                    
                     // Imprimir todas las configuraciones
+                    echo '\n================================================'
+                    echo '      CONFIGURACIÓN PREDETERMINADA (OCULTA)    '
                     echo '================================================'
-                    echo '      CONFIGURACIÓN COMPLETA                   '
+                    configuracionOculta.each { k, v -> echo "  ${k}: ${v}" }
+                    
+                    echo '\n================================================'
+                    echo '           CONFIGURACIÓN DE GCP                '
                     echo '================================================'
-                    echo "ID de Proyecto: ${params.PROJECT_ID}"
-                    echo "Región: ${params.REGION}"
-                    echo "Zona: ${params.ZONE}"
-                    echo "Ambiente: ${params.ENVIRONMENT}"
-                    echo "Nombre de Base de Datos: ${params.DB_NAME}"
-                    echo "Versión de Oracle: ${params.DB_VERSION}"
+                    configuracionGCP.each { k, v -> echo "  ${k}: ${v}" }
+                    
+                    echo '\n================================================'
+                    echo '        CONFIGURACIÓN DE BASE DE DATOS         '
+                    echo '================================================'
+                    configuracionBaseDatos.each { k, v -> echo "  ${k}: ${v}" }
+                    
+                    echo '\n================================================'
+                    echo '         CONFIGURACIÓN DE RECURSOS             '
+                    echo '================================================'
+                    configuracionRecursos.each { k, v -> echo "  ${k}: ${v}" }
+                    
+                    echo '\n================================================'
+                    echo '            CONFIGURACIÓN DE RED               '
+                    echo '================================================'
+                    configuracionRed.each { k, v -> echo "  ${k}: ${v}" }
+                    
+                    echo '\n================================================'
+                    echo '         CONFIGURACIÓN DE SEGURIDAD            '
+                    echo '================================================'
+                    configuracionSeguridad.each { k, v -> echo "  ${k}: ${v}" }
+                    
+                    echo '\n================================================'
+                    echo '        CONFIGURACIÓN DE BACKUP Y MANTENIMIENTO'
+                    echo '================================================'
+                    configuracionBackup.each { k, v -> echo "  ${k}: ${v}" }
+                    
+                    echo '\n================================================'
+                    echo '    CONFIGURACIÓN DE ALTA DISPONIBILIDAD       '
+                    echo '================================================'
+                    configuracionAltaDisponibilidad.each { k, v -> echo "  ${k}: ${v}" }
+                    
+                    echo '\n================================================'
+                    echo '     CONFIGURACIÓN COMPLETADA                  '
+                    echo '================================================\n'
                 }
             }
         }
-
-        stage('Terraform Plan') {
+        stage('Autenticación GCP') {
             steps {
                 script {
-                    echo '================================================'
-                    echo '              EJECUTANDO PLAN DE TERRAFORM      '
-                    echo '================================================'
-                    sh 'terraform plan -out=tfplan'  // Ejemplo de comando para Terraform Plan
+                    if (params.CREDENTIAL_FILE == 'true') {
+                        sh 'gcloud auth activate-service-account --key-file=credentials.json'
+                    } else {
+                        echo 'Autenticación por configuración previa en el agente Jenkins'
+                    }
                 }
             }
         }
 
-        stage('Terraform Apply') {
+        stage('Crear instancia Oracle') {
             steps {
                 script {
-                    echo '================================================'
-                    echo '             EJECUTANDO APPLY DE TERRAFORM      '
-                    echo '================================================'
-                    sh 'terraform apply tfplan'  // Aplica el plan generado previamente
+                    sh """
+                    gcloud sql instances create ${params.DB_NAME} 
+                    --database-version=ORACLE_${params.DB_VERSION}  
+                    --tier=${params.MACHINE_TYPE}    
+                    --region=${params.REGION}
+                    --storage-size=${params.DB_STORAGE_SIZE}
+                    --storage-type=${params.DB_STORAGE_TYPE} 
+                    --root-password=${params.DB_PASSWORD} 
+                    --network=${params.VPC_NETWORK}                                                                                                                  --no-assign-ip=${params.DB_PRIVATE_IP_ENABLED == 'true' ? 'true' : 'false'}
+                    --backup-start-time=${params.DB_BACKUP_START_TIME}
+                    """
                 }
             }
         }
 
-        stage('Terraform Destroy') {
-            when {
-                expression { return params.ENVIRONMENT == 'productivo' } // Solo se ejecuta en Producción
-            }
+        stage('Configurar parámetros avanzados') {
             steps {
-                script {
-                    echo '================================================'
-                    echo '             EJECUTANDO DESTROY DE TERRAFORM    '
-                    echo '================================================'
-                    sh 'terraform destroy -auto-approve'  // Comando para destruir la infraestructura
-                }
+                echo 'Configuraciones adicionales como monitoreo, HA, escalabilidad, etc.'
             }
-        }
-    }
-
-    post {
-        success {
-            echo '================================================'
-            echo '           PIPELINE EJECUTADO EXITOSAMENTE      '
-            echo '================================================'
-        }
-        failure {
-            echo '================================================'
-            echo '           PIPELINE FALLÓ DURANTE LA EJECUCIÓN  '
-            echo '================================================'
-        }
-        always {
-            echo '================================================'
-            echo '         FIN DE LA EJECUCIÓN DEL PIPELINE       '
-            echo '================================================'
         }
     }
 }
