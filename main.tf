@@ -12,13 +12,9 @@ resource "google_compute_instance" "oracle_db" {
   }
 
   attached_disk {
-    type = "PERSISTENT"
+    type = "default"
     mode = "READ_WRITE"
-    initialize_params {
-      size  = var.db_storage_size
-      type  = lower(var.db_storage_type) == "ssd" ? "pd-ssd" : lower(var.db_storage_type) == "balanced" ? "pd-balanced" : "pd-standard"
-    }
-    auto_delete = true
+    
   }
 
   network_interface {
@@ -26,11 +22,10 @@ resource "google_compute_instance" "oracle_db" {
     subnetwork = var.subnet
 
     access_config {
-      count = var.db_public_access_enabled ? 1 : 0
+      
     }
 
     alias_ip_range {
-      count = var.db_ip_range_allowed ? 1 : 0
       ip_cidr_range = "10.0.0.0/24" # puedes parametrizar esto si lo deseas
     }
   }
