@@ -416,7 +416,7 @@ pipeline {
         
         stage('Terraform Init') {
             steps {
-                withCredentials([file(credentialsId: "${CREDENTIALS_ID}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                withCredentials(["GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDENTIALS}"]) {
                     sh 'terraform init'
                 }
             }
@@ -424,7 +424,7 @@ pipeline {
 
         stage('Terraform Action') {
             steps {
-                withCredentials([file(credentialsId: "${CREDENTIALS_ID}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                withCredentials(["GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDENTIALS}"]) {
                     script {
                         def autoApprove = (params.ACTION == 'apply') ? '-auto-approve' : ''
                         sh """
