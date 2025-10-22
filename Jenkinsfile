@@ -422,36 +422,22 @@ pipeline {
             }
         }
 
-        stage('Terraform Action') {
+       stage('Terraform Action') {
             steps {
                 withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                     script {
-                        def tfVars = [
-                            "project_id=${params.PROJECT_ID}",
-                            "region=${params.REGION}",
-                            "zone=${params.ZONE}",
-                            "db_version=${params.DB_VERSION}",
-                            "db_name=${params.DB_NAME}",
-                            "machine_type=${params.MACHINE_TYPE}",
-                            "db_storage_size=${params.DB_STORAGE_SIZE}",
-                            "vpc_network=${params.VPC_NETWORK}",
-                            "subnet=${params.SUBNET}"
-                        ].join(' -var=\'')
-
                         switch(params.ACTION) {
                             case 'plan':
                                 echo '==== Ejecutando Terraform Plan ===='
                                 sh """
-                                    terraform plan -out=tfplan \
-                                    -var='${tfVars}'
+                                    terraform plan -out=tfplan -var-file=terraform.tfvars
                                 """
                                 break
                                 
                             case 'apply':
                                 echo '==== Ejecutando Terraform Apply ===='
                                 sh """
-                                    terraform apply -auto-approve \
-                                    -var='${tfVars}'
+                                    terraform apply -auto-approve -var-file=terraform.tfvars
                                 """
                                 break
                                 
@@ -461,8 +447,7 @@ pipeline {
                                     input message: '¿Está seguro de que desea destruir la infraestructura?'
                                 }
                                 sh """
-                                    terraform destroy -auto-approve \
-                                    -var='${tfVars}'
+                                    terraform destroy -auto-approve -var-file=terraform.tfvars
                                 """
                                 break
                                 
