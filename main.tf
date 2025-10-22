@@ -1,9 +1,3 @@
-provider "google" {
-  project = var.project_id
-  region  = var.region
-  zone    = var.zone
-}
-
 resource "google_compute_instance" "oracle_db" {
   name         = "${var.environment}-oracle-db"
   machine_type = var.machine_type
