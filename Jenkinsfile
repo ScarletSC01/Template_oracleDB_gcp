@@ -416,7 +416,7 @@ pipeline {
         
         stage('Terraform Init') {
             steps {
-                withCredentials(["GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDENTIALS}"]) {
+                withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                     sh 'terraform init'
                 }
             }
