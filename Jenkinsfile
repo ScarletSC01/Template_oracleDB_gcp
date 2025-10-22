@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        GCP_CREDENTIALS = credentials('gcp-sa-key')
+        GCP_CREDENTIALS = credentials('gcp-sa-platform')
         // Configuración del país y proveedor
         PAIS = 'CL'
         DB_SERVICE_PROVIDER = 'GCP - Cloud SQL'
