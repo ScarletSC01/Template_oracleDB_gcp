@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        GCP_CREDENTIALS = credentials('gcp-sa-platform')
+        GCP_CREDENTIALS = credentials('gcp-sa-key')
         // Configuración del país y proveedor
         PAIS = 'CL'
         DB_SERVICE_PROVIDER = 'GCP - Cloud SQL'
@@ -26,6 +26,7 @@ pipeline {
     }
     
     parameters {
+
         // ========================================
         // CONFIGURACIÓN DE PROYECTO GCP
         // ========================================
@@ -259,6 +260,11 @@ pipeline {
             choices: ['false', 'true'], 
             description: 'Habilitar verificación antes de eliminar recursos'
         )
+        choice(
+            name: 'ACTION', 
+            choices: ['plan', 'apply', 'distroy'], 
+            description: 'Acción a seguir'
+        )
     }
     
     stages {
@@ -278,6 +284,9 @@ pipeline {
                     }
                     if (!params.DB_NAME?.trim()) {
                         error('ERROR: DB_NAME es obligatorio')
+                    }
+                    if(!params.ACTION?.trim()){
+                        error('ERROR: ACTION es obligatorio')
                     }
                     
                     echo 'Validación de parámetros completada exitosamente'
@@ -301,6 +310,7 @@ pipeline {
                     ]
 
                     def configuracionGCP = [
+                        'Acción a realizar' : params.ACTION,
                         'ID de Proyecto': params.PROJECT_ID,
                         'Región': params.REGION,
                         'Zona': params.ZONE,
@@ -403,41 +413,30 @@ pipeline {
                 }
             }
         }
-        stage('Autenticación GCP') {
+        
+        stage('Terraform Init') {
             steps {
-                script {
-                    if (params.CREDENTIAL_FILE == 'true') {
-                        sh 'gcloud auth activate-service-account --key-file=credentials.json'
-                    } else {
-                        echo 'Autenticación por configuración previa en el agente Jenkins'
+                withCredentials([file(credentialsId: "${CREDENTIALS_ID}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    sh 'terraform init'
+                }
+            }
+        }
+
+        stage('Terraform Action') {
+            steps {
+                withCredentials([file(credentialsId: "${CREDENTIALS_ID}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    script {
+                        def autoApprove = (params.ACTION == 'apply') ? '-auto-approve' : ''
+                        sh """
+                        terraform ${params.ACTION} ${autoApprove} \
+                        -var='project_id=${params.PROJECT_ID}' \
+                        -var='region=${params.REGION}'
+                        """
                     }
                 }
             }
         }
 
-        stage('Crear instancia Oracle') {
-            steps {
-                script {
-                    sh """
-                    gcloud sql instances create ${params.DB_NAME} \
-                    --database-version=ORACLE_${params.DB_VERSION} \
-                    --tier=${params.MACHINE_TYPE}\
-                    --region=${params.REGION}\
-                    --storage-size=${params.DB_STORAGE_SIZE}\
-                    --storage-type=${params.DB_STORAGE_TYPE} \
-                    --root-password=${params.DB_PASSWORD} \
-                    --network=${params.VPC_NETWORK} \
-                    --no-assign-ip=${params.DB_PRIVATE_IP_ENABLED == 'true' ? 'true' : 'false'}\
-                    --backup-start-time=${params.DB_BACKUP_START_TIME}\
-                    """
-                }
-            }
-        }
-
-        stage('Configurar parámetros avanzados') {
-            steps {
-                echo 'Configuraciones adicionales como monitoreo, HA, escalabilidad, etc.'
-            }
-        }
+        
     }
 }
