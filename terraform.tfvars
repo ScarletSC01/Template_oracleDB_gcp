@@ -4,7 +4,7 @@ region                      = "us-central1"
 zone                        = "us-central1-a"
 environment                 = "desarrollo"
 
-db_version                  = "19c"
+db_version                  = "ORACLE_19"
 db_name                     = "orcl"
 db_sid                      = "ORCL"
 db_character_set            = "AL32UTF8"
@@ -46,3 +46,4 @@ auto_scale_enabled          = false
 db_listener_config          = ""
 
 check_delete                = true
+
