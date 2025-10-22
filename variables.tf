@@ -255,7 +255,7 @@ variable "action" {
   description = "Acción a seguir"
   type        = string
   validation {
-    condition     = contains(["plan", "apply", "destroy"], var.ACTION)
+    condition     = contains(["plan", "apply", "destroy"], var.action)
     error_message = "acción no válida. Usa 'plan', 'apply', 'destroy'."
   }
 }
