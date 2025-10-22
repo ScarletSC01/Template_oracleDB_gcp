@@ -416,7 +416,7 @@ pipeline {
         
         stage('Terraform Init') {
             steps {
-                withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDENTIALS}"]) {
                     sh 'terraform init'
                 }
             }
@@ -424,7 +424,7 @@ pipeline {
 
        stage('Terraform Action') {
             steps {
-                withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDENTIALS}"]) {
                     script {
                         switch(params.ACTION) {
                             case 'plan':
