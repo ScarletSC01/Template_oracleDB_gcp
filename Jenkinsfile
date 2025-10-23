@@ -3,6 +3,8 @@ pipeline {
     
     environment {
         GCP_CREDENTIALS = credentials('gcp-sa-platform')
+        JIRA_API_URL = 'https://bancoripley1.atlassian.net/rest/api/3/issue/AJI-1'
+        TOKEN_JIRA = "ATATT3xFfGF0DfFWblu-HI0b1BGrgGvn0w6hYNsbmP5dmT_tWoMQo3SVjqKRwfwVvDSycjs1iOdwPuMoFdSFiKFK_u_o7aE0izoIBR5wBDtHCabcwSoc6B4U9KlKLeKdMOQbsioIE8pcMdTty16nmQJgBSsfVTMclqFi_bb3Cet_V8dOEsLWAmQ=6C2FB431"
         // Configuración del país y proveedor
         PAIS = 'CL'
         DB_SERVICE_PROVIDER = 'GCP - Cloud SQL'
@@ -414,50 +416,80 @@ pipeline {
             }
         }
         
-        stage('Terraform Init') {
-            steps {
-                withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDENTIALS}"]) {
-                    sh 'terraform init'
-                }
-            }
-        }
+        
+        stages {
+                stage('Verificar estado en Jira') {
+                    steps {
+                        withCredentials([string(credentialsId: ${TOKEN_JIRA}, variable: 'JIRA_TOKEN')]) {
+                            script {
+                                def response = sh(
+                                    script: """
+                                        curl -s -X GET \
+                                        -H "Authorization: Bearer ${JIRA_TOKEN}" \
+                                        -H "Content-Type: application/json" \
+                                        "${JIRA_API_URL}"
+                                    """,
+                                    returnStdout: true
+                                ).trim()
 
-       stage('Terraform Action') {
-            steps {
-                withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDENTIALS}"]) {
-                    script {
-                        switch(params.ACTION) {
-                            case 'plan':
-                                echo '==== Ejecutando Terraform Plan ===='
-                                sh """
-                                    terraform plan -out=tfplan -var-file=terraform.tfvars
-                                """
-                                break
-                                
-                            case 'apply':
-                                echo '==== Ejecutando Terraform Apply ===='
-                                sh """
-                                    terraform apply -auto-approve -var-file=terraform.tfvars
-                                """
-                                break
-                                
-                            case 'distroy':
-                                echo '==== Ejecutando Terraform Destroy ===='
-                                if (params.CHECK_DELETE == 'true') {
-                                    input message: '¿Está seguro de que desea destruir la infraestructura?'
+                                def json = readJSON text: response
+                                def status = json.fields.status.name
+
+                                echo "Estado actual del ticket ${JIRA_API_URL}: ${status}"
+
+                                if (status != 'Ready for Deployment') {
+                                    error "El ticket no está listo para desplegar. Estado actual: ${status}"
                                 }
-                                sh """
-                                    terraform destroy -auto-approve -var-file=terraform.tfvars
-                                """
-                                break
-                                
-                            default:
-                                error "Acción '${params.ACTION}' no reconocida"
+                            }
                         }
                     }
                 }
-            }
         }
+
+    //     stage('Terraform Init') {
+    //         steps {
+    //             withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDENTIALS}"]) {
+    //                 sh 'terraform init'
+    //             }
+    //         }
+    //     }
+
+    //    stage('Terraform Action') {
+    //         steps {
+    //             withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDENTIALS}"]) {
+    //                 script {
+    //                     switch(params.ACTION) {
+    //                         case 'plan':
+    //                             echo '==== Ejecutando Terraform Plan ===='
+    //                             sh """
+    //                                 terraform plan -out=tfplan -var-file=terraform.tfvars
+    //                             """
+    //                             break
+                                
+    //                         case 'apply':
+    //                             echo '==== Ejecutando Terraform Apply ===='
+    //                             sh """
+    //                                 terraform apply -auto-approve -var-file=terraform.tfvars
+    //                             """
+    //                             break
+                                
+    //                         case 'distroy':
+    //                             echo '==== Ejecutando Terraform Destroy ===='
+    //                             if (params.CHECK_DELETE == 'true') {
+    //                                 input message: '¿Está seguro de que desea destruir la infraestructura?'
+    //                             }
+    //                             sh """
+    //                                 terraform destroy -auto-approve -var-file=terraform.tfvars
+    //                             """
+    //                             break
+                                
+    //                         default:
+    //                             error "Acción '${params.ACTION}' no reconocida"
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
 
         
     }
