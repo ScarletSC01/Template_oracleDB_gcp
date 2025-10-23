@@ -426,7 +426,7 @@ pipeline {
             script {
                 def response = sh(
                     script: """
-                        curl -s -X GET "${JIRA_URL}" \\
+                        curl -s -X GET "${JIRA_API_URL}" \\
                         -H "Authorization: Bearer ${JIRA_TOKEN}" \\
                         -H "Accept: application/json"
                     """,
@@ -436,12 +436,12 @@ pipeline {
                 def status = readJSON text: response
                 def estado = status.fields.status.name
 
-                echo "🔍 Estado actual del ticket ${JIRA_URL}: ${estado}"
+                echo "🔍 Estado actual del ticket ${JIRA_API_URL}: ${estado}"
 
                 if (estado == 'Done') {
-                    echo "✅ El ticket está marcado como Done."
+                    echo "El ticket está marcado como Done."
                 } else {
-                    echo "⚠️ El ticket aún no está en estado Done."
+                    echo "El ticket aún no está en estado Done."
                 }
             }
         }
