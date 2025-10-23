@@ -433,7 +433,7 @@ pipeline {
                         def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
                         def response = sh(
                             script: """
-                                curl -s -X GET "https://bancoripley1.atlassian.net/rest/api/3/issue/AJI-1" \\
+                                curl -s -X GET "${JIRA_API_URL}" \\
                                 -H "Authorization: Basic ${auth}" \\
                                 -H "Accept: application/json"
                             """,
@@ -442,7 +442,7 @@ pipeline {
                     
                         def json = new groovy.json.JsonSlurper().parseText(response)
                         def estado = json.fields.status.name
-                        echo "Estado actual del ticket: ${estado}"
+                        echo "Estado actual del ticket\n ${JIRA_API_URL}: ${estado}"
                     }
 
         
