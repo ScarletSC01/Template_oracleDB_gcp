@@ -427,7 +427,7 @@ pipeline {
                 def response = sh(
                     script: """
                         curl -s -X GET "${JIRA_API_URL}" \\
-                        -H "Authorization: Bearer ${JIRA_TOKEN}" \\
+                        -H "Authorization: Bearer ${TOKEN_JIRA}" \\
                         -H "Accept: application/json"
                     """,
                     returnStdout: true
