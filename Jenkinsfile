@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         // GCP_CREDENTIALS = credentials('gcp-sa-platform')
-        JIRA_API_URL = 'https://bancoripley1.atlassian.net/rest/api/3/issue/AJI-1'
+        JIRA_API_URL = 'https://bancoripley1.atlassian.net/rest/api/3/issue/'
         // GCP_CREDENTIALS =
         JIRA_USER = 'lucas.a.gomez@accenture.com'
         TOKEN_JIRA = credentials('JIRA_TOKEN')
@@ -269,6 +269,11 @@ pipeline {
             choices: ['plan', 'apply', 'distroy'], 
             description: 'Acción a seguir'
         )
+        string(
+            name: 'TICKET_JIRA', 
+            defaultValue: 'AJI-1', 
+            description: 'Numero de ticket jira'
+        )
     }
     
     stages {
@@ -314,6 +319,7 @@ pipeline {
                     ]
 
                     def configuracionGCP = [
+                        'Ticket Jira' : params.TICKET_JIRA,
                         'Acción a realizar' : params.ACTION,
                         'ID de Proyecto': params.PROJECT_ID,
                         'Región': params.REGION,
@@ -433,7 +439,7 @@ pipeline {
                         def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
                         def response = sh(
                             script: """
-                                curl -s -X GET "${JIRA_API_URL}" \\
+                                curl -s -X GET '${JIRA_API_URL}${params.TICKET_JIRA}' \\
                                 -H "Authorization: Basic ${auth}" \\
                                 -H "Accept: application/json"
                             """,
