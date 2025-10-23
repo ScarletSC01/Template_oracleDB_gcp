@@ -470,12 +470,29 @@ pipeline {
                                 curl -s -X POST "${JIRA_API_URL}${params.TICKET_JIRA}/comment" \\
                                 -H "Authorization: Basic ${auth}" \\
                                 -H "Content-Type: application/json" \\
-                                -d '{ "body": "${comentario}" }'
+                                -d '{
+                                    "body": {
+                                        "type": "doc",
+                                        "version": 1,
+                                        "content": [
+                                        {
+                                            "type": "paragraph",
+                                            "content": [
+                                            {
+                                                "type": "text",
+                                                "text": "${comentario}"
+                                            }
+                                            ]
+                                        }
+                                        ]
+                                    }
+                                    }
+                                    '
                             """,
                             returnStdout: true
                         ).trim()
 
-                        echo "📝 Comentario enviado: ${response}"
+                        echo "Comentario enviado: ${response}"
                     }
 
                 }
