@@ -423,27 +423,23 @@ pipeline {
        
     stage('Post-Jira Status') {
         steps {
-            script {
-                def response = sh(
-                    script: """
-                        curl -s -X GET "${JIRA_API_URL}" \\
-                        -H "Authorization: Bearer ${TOKEN_JIRA}" \\
-                        -H "Accept: application/json"
-                    """,
-                    returnStdout: true
-                ).trim()
+            
+script {
+    def response = sh(
+                script: """
+                    curl -s -X GET "${JIRA_API_URL}" \\
+                    -H "Authorization: Bearer ${TOKEN_JIRA}" \\
+                    -H "Accept: application/json"
+                """,
+                returnStdout: true
+            ).trim()
 
-                def status = readJSON text: response
-                def estado = status.fields.status.name
+            def json = new groovy.json.JsonSlurper().parseText(response)
+            def estado = json.fields.status.name
 
-                echo "🔍 Estado actual del ticket ${JIRA_API_URL}: ${estado}"
+            echo "Estado actual del ticket ${JIRA_API_URL}: ${estado}"
+        }
 
-                if (estado == 'Done') {
-                    echo "El ticket está marcado como Done."
-                } else {
-                    echo "El ticket aún no está en estado Done."
-                }
-            }
         }
     }
 
