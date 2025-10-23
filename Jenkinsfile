@@ -448,7 +448,7 @@ pipeline {
                     
                         def json = new groovy.json.JsonSlurper().parseText(response)
                         def estado = json.fields.status.name
-                        echo "Estado actual del ticket\n ${JIRA_API_URL}: ${estado}"
+                        echo "Estado actual del ticket ${params.TICKET_JIRA}: ${estado}"
                     }
 
         
