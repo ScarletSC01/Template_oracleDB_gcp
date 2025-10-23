@@ -422,7 +422,7 @@ pipeline {
 
         stage('Verificar estado en Jira') {
                     steps {
-                        withCredentials([string(credentialsId: 'TOKEN_JIRA', variable: 'JIRA_TOKEN')]) {
+                        withCredentials([string(credentialsId: '${JIRA_TOKEN}', variable: 'TOKEN_JIRA')]) {
                             script {
                                 def response = sh(
                                     script: """
