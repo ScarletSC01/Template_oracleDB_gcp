@@ -2,9 +2,10 @@ pipeline {
     agent any
     
     environment {
-        GCP_CREDENTIALS = credentials('gcp-sa-platform')
+        // GCP_CREDENTIALS = credentials('gcp-sa-platform')
         JIRA_API_URL = 'https://bancoripley1.atlassian.net/rest/api/3/issue/AJI-1'
-        TOKEN_JIRA = "ATATT3xFfGF0DfFWblu-HI0b1BGrgGvn0w6hYNsbmP5dmT_tWoMQo3SVjqKRwfwVvDSycjs1iOdwPuMoFdSFiKFK_u_o7aE0izoIBR5wBDtHCabcwSoc6B4U9KlKLeKdMOQbsioIE8pcMdTty16nmQJgBSsfVTMclqFi_bb3Cet_V8dOEsLWAmQ=6C2FB431"
+        // GCP_CREDENTIALS =
+        TOKEN_JIRA = credentials('JIRA_TOKEN')
         // Configuración del país y proveedor
         PAIS = 'CL'
         DB_SERVICE_PROVIDER = 'GCP - Cloud SQL'
@@ -417,34 +418,34 @@ pipeline {
         }
         
         
-        
-                stage('Verificar estado en Jira') {
-                    steps {
-                        withCredentials([string(credentialsId: ${TOKEN_JIRA}, variable: 'JIRA_TOKEN')]) {
-                            script {
-                                def response = sh(
-                                    script: """
-                                        curl -s -X GET \
-                                        -H "Authorization: Bearer ${JIRA_TOKEN}" \
-                                        -H "Content-Type: application/json" \
-                                        "${JIRA_API_URL}"
-                                    """,
-                                    returnStdout: true
-                                ).trim()
 
-                                def json = readJSON text: response
-                                def status = json.fields.status.name
+        stage('Verificar estado en Jira') {
+            steps {
+                withCredentials([string(credentialsId: ${TOKEN_JIRA}, variable: 'JIRA_TOKEN')]) {
+                    script {
+                        def response = sh(
+                            script: """
+                                curl -s -X GET \
+                                -H "Authorization: Bearer ${JIRA_TOKEN}" \
+                                -H "Content-Type: application/json" \
+                                "${JIRA_API_URL}"
+                            """,
+                            returnStdout: true
+                        ).trim()
 
-                                echo "Estado actual del ticket ${JIRA_API_URL}: ${status}"
+                        def json = readJSON text: response
+                        def status = json.fields.status.name
 
-                                if (status != 'Ready for Deployment') {
-                                    error "El ticket no está listo para desplegar. Estado actual: ${status}"
-                                }
-                            }
+                        echo "Estado actual del ticket ${JIRA_API_URL}: ${status}"
+
+                        if (status != 'Ready for Deployment') {
+                            error "El ticket no está listo para desplegar. Estado actual: ${status}"
                         }
                     }
                 }
-        
+            }
+        }
+
 
     //     stage('Terraform Init') {
     //         steps {
