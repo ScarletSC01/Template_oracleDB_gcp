@@ -5,6 +5,7 @@ pipeline {
         // GCP_CREDENTIALS = credentials('gcp-sa-platform')
         JIRA_API_URL = 'https://bancoripley1.atlassian.net/rest/api/3/issue/AJI-1'
         // GCP_CREDENTIALS =
+        JIRA_USER = 'lucas.a.gomez@accenture.com'
         TOKEN_JIRA = credentials('JIRA_TOKEN')
         // Configuración del país y proveedor
         PAIS = 'CL'
@@ -421,28 +422,27 @@ pipeline {
 
 
        
-    stage('Post-Jira Status') {
-        steps {
-            
-script {
-    def response = sh(
-                script: """
-                    curl -s -X GET "${JIRA_API_URL}" \\
-                    -H "Authorization: Bearer ${TOKEN_JIRA}" \\
-                    -H "Accept: application/json"
-                """,
-                returnStdout: true
-            ).trim()
-            echo "response ${response}"
-            def json = new groovy.json.JsonSlurper().parseText(response)
-            echo "json ${json}"
-            def estado = json.fields
-
-            echo "Estado actual del ticket ${JIRA_API_URL}: ${estado}"
+        stage('Post-Jira Status') {
+            steps {
+                
+                script {
+        
+                    withCredentials([usernamePassword(credentialsId: 'JIRA_CREDENTIALS', usernameVariable: 'JIRA_USER', passwordVariable: 'TOKEN_JIRA')]) {
+                        def auth = "${JIRA_USER}:${TOKEN_JIRA}".bytes.encodeBase64().toString()
+                        def response = sh(
+                            script: """
+                                curl -s -X GET "https://bancoripley1.atlassian.net/rest/api/3/issue/AJI-1" \\
+                                -H "Authorization: Basic ${auth}" \\
+                                -H "Accept: application/json"
+                            """,
+                            returnStdout: true
+                        ).trim()
+                    }
+        
+                }
+        
+            }
         }
-
-        }
-    }
 
 
 
