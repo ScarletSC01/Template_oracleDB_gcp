@@ -427,7 +427,7 @@ pipeline {
                 
                 script {
         
-                    withCredentials([usernamePassword(credentialsId: 'JIRA_CREDENTIALS', usernameVariable: 'JIRA_USER', passwordVariable: 'TOKEN_JIRA')]) {
+                    withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'TOKEN_JIRA')]) {
                         def auth = "${JIRA_USER}:${TOKEN_JIRA}".bytes.encodeBase64().toString()
                         def response = sh(
                             script: """
