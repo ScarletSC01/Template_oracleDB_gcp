@@ -427,17 +427,23 @@ pipeline {
                 
                 script {
         
-                    withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'TOKEN_JIRA')]) {
-                        def auth = "${JIRA_USER}:${TOKEN_JIRA}".bytes.encodeBase64().toString()
-                        def response = sh(
-                            script: """
-                                curl -s -X GET "https://bancoripley1.atlassian.net/rest/api/3/issue/AJI-1" \\
-                                -H "Authorization: Basic ${auth}" \\
-                                -H "Accept: application/json"
-                            """,
-                            returnStdout: true
-                        ).trim()
-                    }
+
+                        withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                            def auth = ("${JIRA_USER}:${JIRA_API_TOKEN}" as String).getBytes().encodeBase64().toString()
+                            def response = sh(
+                                script: """
+                                    curl -s -X GET "https://bancoripley1.atlassian.net/rest/api/3/issue/AJI-1" \\
+                                    -H "Authorization: Basic ${auth}" \\
+                                    -H "Accept: application/json"
+                                """,
+                                returnStdout: true
+                            ).trim()
+                        
+                            def json = new groovy.json.JsonSlurper().parseText(response)
+                            def estado = json.fields.status.name
+                            echo "Estado actual del ticket: ${estado}"
+                        }
+
         
                 }
         
