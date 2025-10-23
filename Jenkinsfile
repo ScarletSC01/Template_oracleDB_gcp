@@ -417,7 +417,7 @@ pipeline {
         }
         
         
-        stages {
+        
                 stage('Verificar estado en Jira') {
                     steps {
                         withCredentials([string(credentialsId: ${TOKEN_JIRA}, variable: 'JIRA_TOKEN')]) {
@@ -444,7 +444,7 @@ pipeline {
                         }
                     }
                 }
-        }
+        
 
     //     stage('Terraform Init') {
     //         steps {
