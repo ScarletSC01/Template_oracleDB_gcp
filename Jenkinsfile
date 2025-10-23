@@ -457,6 +457,31 @@ pipeline {
             }
         }
 
+        stage('Post-Coment-jira'){
+            steps{
+                script{
+                    
+                    withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                        def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
+                        def comentario = "Este ticket fue comentario por Lucaneitor"
+
+                        def response = sh(
+                            script: """
+                                curl -s -X POST "${JIRA_API_URL}${params.TICKET_JIRA}/comment" \\
+                                -H "Authorization: Basic ${auth}" \\
+                                -H "Content-Type: application/json" \\
+                                -d '{ "body": "${comentario}" }'
+                            """,
+                            returnStdout: true
+                        ).trim()
+
+                        echo "📝 Comentario enviado: ${response}"
+                    }
+
+                }
+            }
+        }
+
 
 
     //     stage('Terraform Init') {
