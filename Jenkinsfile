@@ -433,9 +433,10 @@ script {
                 """,
                 returnStdout: true
             ).trim()
-
+            echo "response ${response}"
             def json = new groovy.json.JsonSlurper().parseText(response)
-            def estado = json.fields.status.name
+            echo "json ${json}"
+            def estado = json.fields
 
             echo "Estado actual del ticket ${JIRA_API_URL}: ${estado}"
         }
