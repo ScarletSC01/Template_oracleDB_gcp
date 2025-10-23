@@ -419,32 +419,34 @@ pipeline {
         
         
 
+
         stage('Verificar estado en Jira') {
-            steps {
-                withCredentials([string(credentialsId: ${TOKEN_JIRA}, variable: 'JIRA_TOKEN')]) {
-                    script {
-                        def response = sh(
-                            script: """
-                                curl -s -X GET \
-                                -H "Authorization: Bearer ${JIRA_TOKEN}" \
-                                -H "Content-Type: application/json" \
-                                "${JIRA_API_URL}"
-                            """,
-                            returnStdout: true
-                        ).trim()
+                    steps {
+                        withCredentials([string(credentialsId: 'jira-api-token', variable: 'JIRA_TOKEN')]) {
+                            script {
+                                def response = sh(
+                                    script: """
+                                        curl -s -X GET \
+                                        -H "Authorization: Bearer ${JIRA_TOKEN}" \
+                                        -H "Content-Type: application/json" \
+                                        "${JIRA_API_URL}"
+                                    """,
+                                    returnStdout: true
+                                ).trim()
 
-                        def json = readJSON text: response
-                        def status = json.fields.status.name
+                                def json = readJSON text: response
+                                def status = json.fields.status.name
 
-                        echo "Estado actual del ticket ${JIRA_API_URL}: ${status}"
+                                echo "Estado actual del ticket: ${status}"
 
-                        if (status != 'Ready for Deployment') {
-                            error "El ticket no está listo para desplegar. Estado actual: ${status}"
+                                if (status != 'Ready for Deployment') {
+                                    error "El ticket no está listo para desplegar. Estado actual: ${status}"
+                                }
+                            }
                         }
                     }
                 }
-            }
-        }
+
 
 
     //     stage('Terraform Init') {
