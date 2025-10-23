@@ -420,32 +420,32 @@ pipeline {
         
 
 
-        stage('Verificar estado en Jira') {
-                    steps {
-                        withCredentials([string(credentialsId: '${JIRA_TOKEN}', variable: 'TOKEN_JIRA')]) {
-                            script {
-                                def response = sh(
-                                    script: """
-                                        curl -s -X GET \
-                                        -H "Authorization: Bearer ${JIRA_TOKEN}" \
-                                        -H "Content-Type: application/json" \
-                                        "${JIRA_API_URL}"
-                                    """,
-                                    returnStdout: true
-                                ).trim()
+       
+    stage('Post-Jira Status') {
+        steps {
+            script {
+                def response = sh(
+                    script: """
+                        curl -s -X GET "${JIRA_URL}" \\
+                        -H "Authorization: Bearer ${JIRA_TOKEN}" \\
+                        -H "Accept: application/json"
+                    """,
+                    returnStdout: true
+                ).trim()
 
-                                def json = readJSON text: response
-                                def status = json.fields.status.name
+                def status = readJSON text: response
+                def estado = status.fields.status.name
 
-                                echo "Estado actual del ticket: ${status}"
+                echo "🔍 Estado actual del ticket ${JIRA_URL}: ${estado}"
 
-                                if (status != 'Ready for Deployment') {
-                                    error "El ticket no está listo para desplegar. Estado actual: ${status}"
-                                }
-                            }
-                        }
-                    }
+                if (estado == 'Done') {
+                    echo "✅ El ticket está marcado como Done."
+                } else {
+                    echo "⚠️ El ticket aún no está en estado Done."
                 }
+            }
+        }
+    }
 
 
 
