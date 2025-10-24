@@ -564,7 +564,7 @@ pipeline {
                       "themeColor": "0076D7",
                       "title": "🚀 Despliegue iniciado desde Jenkins",
                       "sections": [{
-                        "activityTitle": "**Ambiente:** ${config.general.ENVIRONMENT}",
+                        "activityTitle": "**Ambiente:** ${config.configuracionGCP.Ambiente}",
                         "facts": ${groovy.json.JsonOutput.toJson(facts)},
                         "markdown": true
                       }]
