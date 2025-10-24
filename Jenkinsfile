@@ -605,7 +605,7 @@ pipeline {
                     """
                     sh """
                         curl -H 'Content-Type: application/json' \
-                            -d '${message}' \
+                            -d '${mensajeTeams}' \
                             '${teamsWebhookUrl}'
                     """
                 }
