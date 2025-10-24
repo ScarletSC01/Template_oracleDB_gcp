@@ -271,7 +271,7 @@ pipeline {
         )
         string(
             name: 'TICKET_JIRA', 
-            defaultValue: '', 
+            defaultValue: 'AJI-1', 
             description: 'Numero de ticket jira'
         )
     }
@@ -303,123 +303,104 @@ pipeline {
             }
         }
         
-        stage('Mostrar Configuración') {
-            steps {
-                script {
-                    def configuracionOculta = [
-                        'País': env.PAIS,
-                        'Proveedor de Servicio': env.DB_SERVICE_PROVIDER,
-                        'Motor de Base de Datos': env.DB_ENGINE,
-                        'Backup Habilitado': env.DB_BACKUP_ENABLED,
-                        'Zona Horaria': env.DB_TIME_ZONE,
-                        'Etiquetas de Recursos': env.DB_RESOURCE_LABELS,
-                        'Tags': env.DB_TAGS,
-                        'Usuario de Plataforma': env.DB_PLATFORM_USER,
-                        'Usuario Administrador': env.DB_USER_ADMIN
-                    ]
-
-                    def configuracionGCP = [
-                        'Ticket Jira' : params.TICKET_JIRA,
-                        'Acción a realizar' : params.ACTION,
-                        'ID de Proyecto': params.PROJECT_ID,
-                        'Región': params.REGION,
-                        'Zona': params.ZONE,
-                        'Ambiente': params.ENVIRONMENT
-                    ]
-                    
-                    def configuracionBaseDatos = [
-                        'Versión de Oracle': params.DB_VERSION,
-                        'Nombre de BD': params.DB_NAME,
-                        'SID': params.DB_SID,
-                        'Character Set': params.DB_CHARACTER_SET,
-                        'Usuario de BD': params.DB_USERNAME,
-                        'Conexiones Máximas': params.DB_MAX_CONNECTIONS,
-                        'Habilitar cache de datos': params.ENABLE_CACHE
-                    ]
-                    
-                    def configuracionRecursos = [
-                        'Tipo de Máquina': params.MACHINE_TYPE,
-                        'Tamaño de Almacenamiento': "${params.DB_STORAGE_SIZE} GB",
-                        'Tipo de Almacenamiento': params.DB_STORAGE_TYPE,
-                        'Auto Resize': params.DB_STORAGE_AUTO_RESIZE,
-                        'Tipo de Disco de Arranque': params.BOOT_DISK_TYPE,
-                        'Tamaño de Disco de Arranque': "${params.BOOT_DISK_SIZE} GB"
-                    ]
-                    
-                    def configuracionRed = [
-                        'Red VPC': params.VPC_NETWORK,
-                        'Subred': params.SUBNET,
-                        'IP Privada': params.DB_PRIVATE_IP_ENABLED,
-                        'Acceso Público': params.DB_PUBLIC_ACCESS_ENABLED,
-                        'Rangos IP Permitidos': params.DB_IP_RANGE_ALLOWED,
-                        'SSL Habilitado': params.DB_SSL_ENABLED
-                    ]
-                    
-                    def configuracionSeguridad = [
+        def getConfiguracionCompleta(){
+            def config = [
+                'ConfiguracionOculta':[
+                    'País': env.PAIS,
+                    'Proveedor de Servicio': env.DB_SERVICE_PROVIDER,
+                    'Motor de Base de Datos': env.DB_ENGINE,
+                    'Backup Habilitado': env.DB_BACKUP_ENABLED,
+                    'Zona Horaria': env.DB_TIME_ZONE,
+                    'Etiquetas de Recursos': env.DB_RESOURCE_LABELS,
+                    'Tags': env.DB_TAGS,
+                    'Usuario de Plataforma': env.DB_PLATFORM_USER,
+                    'Usuario Administrador': env.DB_USER_ADMIN
+                ],
+                'configuracionGCP':[
+                    'Ticket Jira' : params.TICKET_JIRA,
+                    'Acción a realizar' : params.ACTION,
+                    'ID de Proyecto': params.PROJECT_ID,
+                    'Región': params.REGION,
+                    'Zona': params.ZONE,
+                    'Ambiente': params.ENVIRONMENT
+                ],
+                'configuracionBaseDatos':[
+                    'Versión de Oracle': params.DB_VERSION,
+                    'Nombre de BD': params.DB_NAME,
+                    'SID': params.DB_SID,
+                    'Character Set': params.DB_CHARACTER_SET,
+                    'Usuario de BD': params.DB_USERNAME,
+                    'Conexiones Máximas': params.DB_MAX_CONNECTIONS,
+                    'Habilitar cache de datos': params.ENABLE_CACHE
+                ],
+                'configuracionRecursos':[
+                    'Tipo de Máquina': params.MACHINE_TYPE,
+                    'Tamaño de Almacenamiento': "${params.DB_STORAGE_SIZE} GB",
+                    'Tipo de Almacenamiento': params.DB_STORAGE_TYPE,
+                    'Auto Resize': params.DB_STORAGE_AUTO_RESIZE,
+                    'Tipo de Disco de Arranque': params.BOOT_DISK_TYPE,
+                    'Tamaño de Disco de Arranque': "${params.BOOT_DISK_SIZE} GB"
+                ],
+                'configuracionRed':[
+                    'Red VPC': params.VPC_NETWORK,
+                    'Subred': params.SUBNET,
+                    'IP Privada': params.DB_PRIVATE_IP_ENABLED,
+                    'Acceso Público': params.DB_PUBLIC_ACCESS_ENABLED,
+                    'Rangos IP Permitidos': params.DB_IP_RANGE_ALLOWED,
+                    'SSL Habilitado': params.DB_SSL_ENABLED
+                ]
+                'configuracionSeguridad':[
                         'Encriptación': params.DB_ENCRYPTION_ENABLED,
                         'Protección contra Eliminación': params.DB_DELETION_PROTECTION,
                         'Rol IAM': params.IAM_ROLE,
                         'Archivo de Credenciales': params.CREDENTIAL_FILE
-                    ]
+                ]
+                'configuracionBackup':[
+                    'Días de Retención': params.BACKUP_RETENTION_DAYS,
+                    'Hora de Inicio': params.DB_BACKUP_START_TIME,
+                    'Día de Mantenimiento': params.DB_MAINTENANCE_WINDOW_DAY,
+                    'Hora de Mantenimiento': params.DB_MAINTENANCE_WINDOW_HOUR
+                ]
+                'configuracionAltaDisponibilidad':[
+                    'Alta Disponibilidad': params.DB_HIGH_AVAILABILITY,
+                    'Auto Escalado': params.AUTO_SCALE_ENABLED,
+                    'Monitoreo Avanzado': params.DB_MONITORING_ENABLED,
+                    'Configuración de Listener': params.DB_LISTENER_CONFIG
+                ]
+            ]
+            return config
+        }
+
+        def formatearConfiguracion(config) {
+            def messageText = ""
+            config.each { seccion, valores ->
+                messageText += "### ${seccion}\n"
+                valores.each { key, value ->
+                    messageText += "- **${key}:** ${value}\n"
+                }
+                messageText += "\n"
+            }
+            return messageText
+        }
+        stage('Mostrar Configuración') {
+            steps {
+                script {
+                    def config = getConfiguracionCompleta()
+                    def timestamp = new Date().format('dd/MM/yyyy HH:mm:ss')
                     
-                    def configuracionBackup = [
-                        'Días de Retención': params.BACKUP_RETENTION_DAYS,
-                        'Hora de Inicio': params.DB_BACKUP_START_TIME,
-                        'Día de Mantenimiento': params.DB_MAINTENANCE_WINDOW_DAY,
-                        'Hora de Mantenimiento': params.DB_MAINTENANCE_WINDOW_HOUR
-                    ]
+                    echo "📋 EVIDENCIA DE CONFIGURACIÓN - ${timestamp}"
+                    echo "================================================"
                     
-                    def configuracionAltaDisponibilidad = [
-                        'Alta Disponibilidad': params.DB_HIGH_AVAILABILITY,
-                        'Auto Escalado': params.AUTO_SCALE_ENABLED,
-                        'Monitoreo Avanzado': params.DB_MONITORING_ENABLED,
-                        'Configuración de Listener': params.DB_LISTENER_CONFIG
-                    ]
+                    config.each { seccion, valores ->
+                        echo "\n🔹 ${seccion}"
+                        echo "------------------------------------------------"
+                        valores.each { k, v -> 
+                            echo "  ▪ ${k}: ${v}"
+                        }
+                    }
                     
-                    // Imprimir todas las configuraciones
-                    echo '\n================================================'
-                    echo '      CONFIGURACIÓN PREDETERMINADA (OCULTA)    '
-                    echo '================================================'
-                    configuracionOculta.each { k, v -> echo "  ${k}: ${v}" }
-                    
-                    echo '\n================================================'
-                    echo '           CONFIGURACIÓN DE GCP                '
-                    echo '================================================'
-                    configuracionGCP.each { k, v -> echo "  ${k}: ${v}" }
-                    
-                    echo '\n================================================'
-                    echo '        CONFIGURACIÓN DE BASE DE DATOS         '
-                    echo '================================================'
-                    configuracionBaseDatos.each { k, v -> echo "  ${k}: ${v}" }
-                    
-                    echo '\n================================================'
-                    echo '         CONFIGURACIÓN DE RECURSOS             '
-                    echo '================================================'
-                    configuracionRecursos.each { k, v -> echo "  ${k}: ${v}" }
-                    
-                    echo '\n================================================'
-                    echo '            CONFIGURACIÓN DE RED               '
-                    echo '================================================'
-                    configuracionRed.each { k, v -> echo "  ${k}: ${v}" }
-                    
-                    echo '\n================================================'
-                    echo '         CONFIGURACIÓN DE SEGURIDAD            '
-                    echo '================================================'
-                    configuracionSeguridad.each { k, v -> echo "  ${k}: ${v}" }
-                    
-                    echo '\n================================================'
-                    echo '        CONFIGURACIÓN DE BACKUP Y MANTENIMIENTO'
-                    echo '================================================'
-                    configuracionBackup.each { k, v -> echo "  ${k}: ${v}" }
-                    
-                    echo '\n================================================'
-                    echo '    CONFIGURACIÓN DE ALTA DISPONIBILIDAD       '
-                    echo '================================================'
-                    configuracionAltaDisponibilidad.each { k, v -> echo "  ${k}: ${v}" }
-                    
-                    echo '\n================================================'
-                    echo '     CONFIGURACIÓN COMPLETADA                  '
-                    echo '================================================\n'
+                    // Guardar la configuración para uso posterior
+                    env.CONFIGURACION_FORMATTED = formatearConfiguracion(config)
                 }
             }
         }
@@ -499,71 +480,68 @@ pipeline {
         //     }
         // }
 
+        // stage('Marcar Ticket como Finalizado en Jira') {
+        //     steps {
+        //         script {
+        //             withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+        //                 def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
 
-        
-     stage('Notify Teams') {
+        //                 sh """
+        //                     curl -s -X POST "https://bancoripley1.atlassian.net/rest/api/3/issue/${params.TICKET_JIRA}/transitions" \
+        //                     -H "Authorization: Basic ${auth}" \
+        //                     -H "Content-Type: application/json" \
+        //                     -d '{"transition": {"id": "31"}}'
+        //                 """
+
+        //                 echo "Ticket ${params.TICKET_JIRA} marcado como 'Finalizado'."
+        //             }
+        //         }
+        //     }
+        // }
+            
+        stage('Notify Teams') {
             steps {
                 script {
-                    
-                facts = [
-                    [name: "PROJECT_ID", value: params.PROJECT_ID],
-                    [name: "REGION", value: params.REGION],
-                    [name: "ZONE", value: params.ZONE],
-                    [name: "ENVIRONMENT", value: params.ENVIRONMENT],
-                    [name: "DB_VERSION", value: params.DB_VERSION],
-                    [name: "DB_NAME", value: params.DB_NAME],
-                    [name: "DB_SID", value: params.DB_SID],
-                    [name: "DB_CHARACTER_SET", value: params.DB_CHARACTER_SET],
-                    [name: "DB_USERNAME", value: params.DB_USERNAME],
-                    [name: "DB_PASSWORD", value: params.DB_PASSWORD],
-                    [name: "DB_MAX_CONNECTIONS", value: params.DB_MAX_CONNECTIONS],
-                    [name: "ENABLE_CACHE", value: params.ENABLE_CACHE],
-                    [name: "MACHINE_TYPE", value: params.MACHINE_TYPE],
-                    [name: "DB_STORAGE_SIZE", value: params.DB_STORAGE_SIZE],
-                    [name: "DB_STORAGE_TYPE", value: params.DB_STORAGE_TYPE],
-                    [name: "DB_STORAGE_AUTO_RESIZE", value: params.DB_STORAGE_AUTO_RESIZE],
-                    [name: "BOOT_DISK_TYPE", value: params.BOOT_DISK_TYPE],
-                    [name: "BOOT_DISK_SIZE", value: params.BOOT_DISK_SIZE],
-                    [name: "OS_IMAGE", value: params.OS_IMAGE],
-                    [name: "VPC_NETWORK", value: params.VPC_NETWORK],
-                    [name: "SUBNET", value: params.SUBNET],
-                    [name: "DB_PRIVATE_IP_ENABLED", value: params.DB_PRIVATE_IP_ENABLED],
-                    [name: "DB_PUBLIC_ACCESS_ENABLED", value: params.DB_PUBLIC_ACCESS_ENABLED],
-                    [name: "DB_IP_RANGE_ALLOWED", value: params.DB_IP_RANGE_ALLOWED],
-                    [name: "DB_SSL_ENABLED", value: params.DB_SSL_ENABLED],
-                    [name: "DB_ENCRYPTION_ENABLED", value: params.DB_ENCRYPTION_ENABLED],
-                    [name: "DB_DELETION_PROTECTION", value: params.DB_DELETION_PROTECTION],
-                    [name: "IAM_ROLE", value: params.IAM_ROLE],
-                    [name: "CREDENTIAL_FILE", value: params.CREDENTIAL_FILE],
-                    [name: "BACKUP_RETENTION_DAYS", value: params.BACKUP_RETENTION_DAYS],
-                    [name: "DB_BACKUP_START_TIME", value: params.DB_BACKUP_START_TIME],
-                    [name: "DB_MAINTENANCE_WINDOW_DAY", value: params.DB_MAINTENANCE_WINDOW_DAY],
-                    [name: "DB_MAINTENANCE_WINDOW_HOUR", value: params.DB_MAINTENANCE_WINDOW_HOUR],
-                    [name: "DB_MONITORING_ENABLED", value: params.DB_MONITORING_ENABLED],
-                    [name: "DB_HIGH_AVAILABILITY", value: params.DB_HIGH_AVAILABILITY],
-                    [name: "AUTO_SCALE_ENABLED", value: params.AUTO_SCALE_ENABLED],
-                    [name: "DB_LISTENER_CONFIG", value: params.DB_LISTENER_CONFIG],
-                    [name: "CHECK_DELETE", value: params.CHECK_DELETE],
-                    [name: "ACTION", value: params.ACTION],
-                    [name: "TICKET_JIRA", value: params.TICKET_JIRA]
-                ]
-
+                    def timestamp = new Date().format('dd/MM/yyyy HH:mm:ss')
                     def teamsWebhookUrl = 'https://accenture.webhook.office.com/webhookb2/870e2ab9-53bf-43f6-8655-376cbe11bd1c@e0793d39-0939-496d-b129-198edd916feb/IncomingWebhook/f495e4cf395c416e83eae4fb3b9069fd/b08cc148-e951-496b-9f46-3f7e35f79570/V2r0-VttaFGsrZXpm8qS18JcqaHZ26SxRAT51CZvkTR-A1'
+                    
                     def message = """
                     {
                         "@type": "MessageCard",
                         "@context": "http://schema.org/extensions",
-                        "summary": "Notificación de Jenkins",
+                        "summary": "Evidencia de Configuración",
                         "themeColor": "0076D7",
-                        "title": "Pipeline ejecutado",                        
-                        "facts": ${groovy.json.JsonOutput.toJson(facts)},
-                        "markdown": true
-
+                        "title": "📋 Evidencia de Configuración - Base de Datos Oracle",
+                        "sections": [
+                            {
+                                "activityTitle": "Detalles de la Ejecución",
+                                "activitySubtitle": "Fecha: ${timestamp}",
+                                "facts": [
+                                    {
+                                        "name": "Ticket Jira",
+                                        "value": "${params.TICKET_JIRA}"
+                                    },
+                                    {
+                                        "name": "Acción",
+                                        "value": "${params.ACTION}"
+                                    },
+                                    {
+                                        "name": "Ambiente",
+                                        "value": "${params.ENVIRONMENT}"
+                                    }
+                                ],
+                                "text": ${groovy.json.JsonOutput.toJson(env.CONFIGURACION_FORMATTED)}
+                            }
+                        ]
                     }
                     """
+
+                    // Escapar caracteres especiales para curl
+                    message = message.replaceAll('"', '\\\\"')
+
                     sh """
                         curl -H 'Content-Type: application/json' \
-                            -d '${message}' \
+                            -d "${message}" \
                             '${teamsWebhookUrl}'
                     """
                 }
