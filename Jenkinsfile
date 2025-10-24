@@ -604,14 +604,13 @@ pipeline {
                    
                     }
                     """
-                    timeout(time: 2, unit: 'MINUTES') {
-                    sh """
+                    
+                    sh """#!/bin/bash
                         curl -H 'Content-Type: application/json' \
-                            -d '${mensajeTeams}' \
+                            -d '${mensajeTeams.replaceAll("'", "\\'")}}' \
                             '${teamsWebhookUrl}'
                     """
-                    }
-                }
+                
             }
         }
 
