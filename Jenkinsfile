@@ -29,7 +29,7 @@ pipeline {
         DB_PASSWORD_ADMIN = 'password'
 
         //obtener todas las variables
-        CONFIG_JSON = ''
+        
     }
     
     parameters {
