@@ -599,7 +599,7 @@ pipeline {
                     "@context": "http://schema.org/extensions",
                     "summary": "Despliegue de base de datos Oracle",
                     "themeColor": "0076D7",
-                    "title": "🚀 Despliegue iniciado desde Jenkins",
+                    "title": "🚀 Despliegue de base de datos Oracle iniciado desde Jenkins",
                     "text": "${mensajeFinal}"                     
                    
                     }
