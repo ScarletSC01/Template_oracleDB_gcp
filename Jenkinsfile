@@ -552,42 +552,42 @@ pipeline {
                     mensajeFinal += '\n================================================\n'
                     mensajeFinal +=  '\n      CONFIGURACIÓN PREDETERMINADA (OCULTA)    \n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionOculta.each { k, v -> mensajeFinal +=  ' \n ${k}: ${v} \n' }
+                    config.configuracionOculta.each { k, v -> mensajeFinal +=  " \n ${k}: ${v} \n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  '\n           CONFIGURACIÓN DE GCP                \n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionGCP.each { k, v -> mensajeFinal +=  ' \n ${k}: ${v}\n' }
+                    config.configuracionGCP.each { k, v -> mensajeFinal +=  " \n ${k}: ${v}\n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  '\n        CONFIGURACIÓN DE BASE DE DATOS         \n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionBaseDatos.each { k, v -> mensajeFinal +=  '\n  ${k}: ${v}\n' }
+                    config.configuracionBaseDatos.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  '\n         CONFIGURACIÓN DE RECURSOS             \n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionRecursos.each { k, v -> mensajeFinal +=  '\n  ${k}: ${v}\n' }
+                    config.configuracionRecursos.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  ' \n           CONFIGURACIÓN DE RED               \n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionRed.each { k, v -> mensajeFinal +=  '\n  ${k}: ${v}\n' }
+                    config.configuracionRed.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  '\n         CONFIGURACIÓN DE SEGURIDAD            \n'
                     mensajeFinal +=  '\n===============================================\n'
-                    config.configuracionSeguridad.each { k, v -> mensajeFinal +=  '\n  ${k}: ${v}\n' }
+                    config.configuracionSeguridad.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  '\n        CONFIGURACIÓN DE BACKUP Y MANTENIMIENTO\n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionBackup.each { k, v -> mensajeFinal +=  '\n ${k}: ${v}\n' }
+                    config.configuracionBackup.each { k, v -> mensajeFinal +=  "\n ${k}: ${v}\n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  '\n    CONFIGURACIÓN DE ALTA DISPONIBILIDAD       \n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionAltaDisponibilidad.each { k, v -> mensajeFinal +=  '\n  ${k}: ${v}\n' }
+                    config.configuracionAltaDisponibilidad.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
                     echo "${mensajeFinal}"
 
@@ -599,14 +599,14 @@ pipeline {
                     "@context": "http://schema.org/extensions",
                     "summary": "Despliegue de base de datos Oracle",
                     "themeColor": "0076D7",
-                    "title": "🚀 Despliegue iniciado desde Jenkins",
+                    "title": "Despliegue de base de datos iniciado desde Jenkins",
                     "text": "${mensajeFinal}"                     
                    
                     }
                     """
                     
                     sh """#!/bin/bash
-                        curl -H 'Content-Type: application/json' \
+                        curl -H "Content-Type: application/json" \
                             -d '${mensajeTeams.replaceAll("'", "\\'")}' \
                             '${teamsWebhookUrl}'
                     """
