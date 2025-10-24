@@ -599,7 +599,7 @@ pipeline {
                     "summary": "Despliegue de base de datos Oracle",
                     "themeColor": "0076D7",
                     "title": "Despliegue de base de datos Oracle iniciado desde Jenkins",
-                     "text": ${mensajeFinal}                     
+                    "text": "${mensajeFinal}"                     
                    
                     }
                     """
