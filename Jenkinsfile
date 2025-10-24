@@ -601,8 +601,8 @@ pipeline {
                     "title": "🚀 Despliegue iniciado desde Jenkins",
                     "sections": [{
                         "activityTitle": "**Ambiente:** ${config.configuracionGCP.Ambiente}",
-                        "facts": ${mensajeFinal},
-                        "markdown": true
+                        "text": ${mensajeFinal},
+                        
                     }]
                     }
                     """
