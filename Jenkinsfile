@@ -501,18 +501,64 @@ pipeline {
 
 
         
-        stage('Notify Teams') {
+     stage('Notify Teams') {
             steps {
                 script {
-                    def teamsWebhookUrl = 'https://accenture.webhook.office.com/webhookb2/870e2ab9-53bf-43f6-8655-376cbe11bd1c@e0793d39-0939-496d-b129-198edd916feb/IncomingWebhook/a3e87cce53f64e499bde5afbdbc039f8/b08cc148-e951-496b-9f46-3f7e35f79570/V27TWdBPSoJzFUQBZGSoZPoDRGDAvGXNfCTU2SLV2OigY1'
+                    
+                facts = [
+                    [name: "PROJECT_ID", value: params.PROJECT_ID],
+                    [name: "REGION", value: params.REGION],
+                    [name: "ZONE", value: params.ZONE],
+                    [name: "ENVIRONMENT", value: params.ENVIRONMENT],
+                    [name: "DB_VERSION", value: params.DB_VERSION],
+                    [name: "DB_NAME", value: params.DB_NAME],
+                    [name: "DB_SID", value: params.DB_SID],
+                    [name: "DB_CHARACTER_SET", value: params.DB_CHARACTER_SET],
+                    [name: "DB_USERNAME", value: params.DB_USERNAME],
+                    [name: "DB_PASSWORD", value: params.DB_PASSWORD],
+                    [name: "DB_MAX_CONNECTIONS", value: params.DB_MAX_CONNECTIONS],
+                    [name: "ENABLE_CACHE", value: params.ENABLE_CACHE],
+                    [name: "MACHINE_TYPE", value: params.MACHINE_TYPE],
+                    [name: "DB_STORAGE_SIZE", value: params.DB_STORAGE_SIZE],
+                    [name: "DB_STORAGE_TYPE", value: params.DB_STORAGE_TYPE],
+                    [name: "DB_STORAGE_AUTO_RESIZE", value: params.DB_STORAGE_AUTO_RESIZE],
+                    [name: "BOOT_DISK_TYPE", value: params.BOOT_DISK_TYPE],
+                    [name: "BOOT_DISK_SIZE", value: params.BOOT_DISK_SIZE],
+                    [name: "OS_IMAGE", value: params.OS_IMAGE],
+                    [name: "VPC_NETWORK", value: params.VPC_NETWORK],
+                    [name: "SUBNET", value: params.SUBNET],
+                    [name: "DB_PRIVATE_IP_ENABLED", value: params.DB_PRIVATE_IP_ENABLED],
+                    [name: "DB_PUBLIC_ACCESS_ENABLED", value: params.DB_PUBLIC_ACCESS_ENABLED],
+                    [name: "DB_IP_RANGE_ALLOWED", value: params.DB_IP_RANGE_ALLOWED],
+                    [name: "DB_SSL_ENABLED", value: params.DB_SSL_ENABLED],
+                    [name: "DB_ENCRYPTION_ENABLED", value: params.DB_ENCRYPTION_ENABLED],
+                    [name: "DB_DELETION_PROTECTION", value: params.DB_DELETION_PROTECTION],
+                    [name: "IAM_ROLE", value: params.IAM_ROLE],
+                    [name: "CREDENTIAL_FILE", value: params.CREDENTIAL_FILE],
+                    [name: "BACKUP_RETENTION_DAYS", value: params.BACKUP_RETENTION_DAYS],
+                    [name: "DB_BACKUP_START_TIME", value: params.DB_BACKUP_START_TIME],
+                    [name: "DB_MAINTENANCE_WINDOW_DAY", value: params.DB_MAINTENANCE_WINDOW_DAY],
+                    [name: "DB_MAINTENANCE_WINDOW_HOUR", value: params.DB_MAINTENANCE_WINDOW_HOUR],
+                    [name: "DB_MONITORING_ENABLED", value: params.DB_MONITORING_ENABLED],
+                    [name: "DB_HIGH_AVAILABILITY", value: params.DB_HIGH_AVAILABILITY],
+                    [name: "AUTO_SCALE_ENABLED", value: params.AUTO_SCALE_ENABLED],
+                    [name: "DB_LISTENER_CONFIG", value: params.DB_LISTENER_CONFIG],
+                    [name: "CHECK_DELETE", value: params.CHECK_DELETE],
+                    [name: "ACTION", value: params.ACTION],
+                    [name: "TICKET_JIRA", value: params.TICKET_JIRA]
+                ]
+
+                    def teamsWebhookUrl = 'https://accenture.webhook.office.com/webhookb2/870e2ab9-53bf-43f6-8655-376cbe11bd1c@e0793d39-0939-496d-b129-198edd916feb/IncomingWebhook/f495e4cf395c416e83eae4fb3b9069fd/b08cc148-e951-496b-9f46-3f7e35f79570/V2r0-VttaFGsrZXpm8qS18JcqaHZ26SxRAT51CZvkTR-A1'
                     def message = """
                     {
                         "@type": "MessageCard",
                         "@context": "http://schema.org/extensions",
                         "summary": "Notificación de Jenkins",
                         "themeColor": "0076D7",
-                        "title": "Pipeline ejecutado",
-                        "text": "Mensaje de pruena enviado pancracio"
+                        "title": "Pipeline ejecutado",                        
+                        "facts": ${groovy.json.JsonOutput.toJson(facts)},
+                        "markdown": true
+
                     }
                     """
                     sh """
@@ -523,7 +569,6 @@ pipeline {
                 }
             }
         }
-
 
 
     //     stage('Terraform Init') {
