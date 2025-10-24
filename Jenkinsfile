@@ -383,14 +383,14 @@ pipeline {
                     
                 // Guardar todo en un solo objeto JSON para reutilizar
                     env.CONFIG_JSON = groovy.json.JsonOutput.toJson([
-                        configuracionOculta: configuracionOculta,
-                        configuracionGCP: configuracionGCP,
-                        configuracionBaseDatos: configuracionBaseDatos,
-                        configuracionRecursos: configuracionRecursos,
-                        configuracionRed: configuracionRed,
-                        configuracionSeguridad: configuracionSeguridad,
-                        configuracionBackup: configuracionBackup,
-                        configuracionAltaDisponibilidad: configuracionAltaDisponibilidad,
+                        oculta: configuracionOculta,
+                        GCP: configuracionGCP,
+                        baseDatos: configuracionBaseDatos,
+                        recursos: configuracionRecursos,
+                        red: configuracionRed,
+                        seguridad: configuracionSeguridad,
+                        backup: configuracionBackup,
+                        altaDisponibilidad: configuracionAltaDisponibilidad,
                     ])
 
                 }
