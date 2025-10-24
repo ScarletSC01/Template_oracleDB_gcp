@@ -599,11 +599,9 @@ pipeline {
                     "summary": "Despliegue de base de datos Oracle",
                     "themeColor": "0076D7",
                     "title": "🚀 Despliegue iniciado desde Jenkins",
-                    "sections": [{
-                        "activityTitle": "**Ambiente:** ${config.configuracionGCP.Ambiente}",
-                        "text": ${mensajeFinal},
-                        
-                    }]
+                    "title": "🚀 Despliegue iniciado desde Jenkins",
+                     "text": ${mensajeFinal}                     
+                   
                     }
                     """
                     sh """
