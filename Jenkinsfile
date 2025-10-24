@@ -546,10 +546,10 @@ pipeline {
                 script {
                     
                     def config = new groovy.json.JsonSlurper().parseText(env.CONFIG_JSON)
-                    def mensajeFinal = ""
+                    def mensajeFinal = "mensaje final"
                     
                     
-                    mensajeFinal += '\n================================================\n'
+                    // mensajeFinal += '\n================================================\n'
                     // mensajeFinal +=  '\n      CONFIGURACIÓN PREDETERMINADA (OCULTA)    \n'
                     // mensajeFinal +=  '\n================================================\n'
                     // config.configuracionOculta.each { k, v -> mensajeFinal +=  " \n ${k}: ${v} \n" }
