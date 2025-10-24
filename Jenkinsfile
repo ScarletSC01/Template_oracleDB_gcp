@@ -275,7 +275,84 @@ pipeline {
             description: 'Numero de ticket jira'
         )
     }
-    
+     def getConfiguracionCompleta(){
+        def config = [
+            'ConfiguracionOculta':[
+                'País': env.PAIS,
+                'Proveedor de Servicio': env.DB_SERVICE_PROVIDER,
+                'Motor de Base de Datos': env.DB_ENGINE,
+                'Backup Habilitado': env.DB_BACKUP_ENABLED,
+                'Zona Horaria': env.DB_TIME_ZONE,
+                'Etiquetas de Recursos': env.DB_RESOURCE_LABELS,
+                'Tags': env.DB_TAGS,
+                'Usuario de Plataforma': env.DB_PLATFORM_USER,
+                'Usuario Administrador': env.DB_USER_ADMIN
+            ],
+            'configuracionGCP':[
+                'Ticket Jira' : params.TICKET_JIRA,
+                'Acción a realizar' : params.ACTION,
+                'ID de Proyecto': params.PROJECT_ID,
+                'Región': params.REGION,
+                'Zona': params.ZONE,
+                'Ambiente': params.ENVIRONMENT
+            ],
+            'configuracionBaseDatos':[
+                'Versión de Oracle': params.DB_VERSION,
+                'Nombre de BD': params.DB_NAME,
+                'SID': params.DB_SID,
+                'Character Set': params.DB_CHARACTER_SET,
+                'Usuario de BD': params.DB_USERNAME,
+                'Conexiones Máximas': params.DB_MAX_CONNECTIONS,
+                'Habilitar cache de datos': params.ENABLE_CACHE
+            ],
+            'configuracionRecursos':[
+                'Tipo de Máquina': params.MACHINE_TYPE,
+                'Tamaño de Almacenamiento': "${params.DB_STORAGE_SIZE} GB",
+                'Tipo de Almacenamiento': params.DB_STORAGE_TYPE,
+                'Auto Resize': params.DB_STORAGE_AUTO_RESIZE,
+                'Tipo de Disco de Arranque': params.BOOT_DISK_TYPE,
+                'Tamaño de Disco de Arranque': "${params.BOOT_DISK_SIZE} GB"
+            ],
+            'configuracionRed':[
+                'Red VPC': params.VPC_NETWORK,
+                'Subred': params.SUBNET,
+                'IP Privada': params.DB_PRIVATE_IP_ENABLED,
+                'Acceso Público': params.DB_PUBLIC_ACCESS_ENABLED,
+                'Rangos IP Permitidos': params.DB_IP_RANGE_ALLOWED,
+                'SSL Habilitado': params.DB_SSL_ENABLED
+            ],
+            'configuracionSeguridad':[
+                    'Encriptación': params.DB_ENCRYPTION_ENABLED,
+                    'Protección contra Eliminación': params.DB_DELETION_PROTECTION,
+                    'Rol IAM': params.IAM_ROLE,
+                    'Archivo de Credenciales': params.CREDENTIAL_FILE
+            ],
+            'configuracionBackup':[
+                'Días de Retención': params.BACKUP_RETENTION_DAYS,
+                'Hora de Inicio': params.DB_BACKUP_START_TIME,
+                'Día de Mantenimiento': params.DB_MAINTENANCE_WINDOW_DAY,
+                'Hora de Mantenimiento': params.DB_MAINTENANCE_WINDOW_HOUR
+            ],
+            'configuracionAltaDisponibilidad':[
+                'Alta Disponibilidad': params.DB_HIGH_AVAILABILITY,
+                'Auto Escalado': params.AUTO_SCALE_ENABLED,
+                'Monitoreo Avanzado': params.DB_MONITORING_ENABLED,
+                'Configuración de Listener': params.DB_LISTENER_CONFIG
+            ],
+        ]
+        return config
+    }
+    def formatearConfiguracion(config) {
+        def messageText = ""
+        config.each { seccion, valores ->
+            messageText += "### ${seccion}\n"
+            valores.each { key, value ->
+                messageText += "- **${key}:** ${value}\n"
+            }
+            messageText += "\n"
+        }
+        return messageText
+    }
     stages {
         stage('Validación de Parámetros') {
             steps {
@@ -303,85 +380,9 @@ pipeline {
             }
         }
         
-        def getConfiguracionCompleta(){
-            def config = [
-                'ConfiguracionOculta':[
-                    'País': env.PAIS,
-                    'Proveedor de Servicio': env.DB_SERVICE_PROVIDER,
-                    'Motor de Base de Datos': env.DB_ENGINE,
-                    'Backup Habilitado': env.DB_BACKUP_ENABLED,
-                    'Zona Horaria': env.DB_TIME_ZONE,
-                    'Etiquetas de Recursos': env.DB_RESOURCE_LABELS,
-                    'Tags': env.DB_TAGS,
-                    'Usuario de Plataforma': env.DB_PLATFORM_USER,
-                    'Usuario Administrador': env.DB_USER_ADMIN
-                ],
-                'configuracionGCP':[
-                    'Ticket Jira' : params.TICKET_JIRA,
-                    'Acción a realizar' : params.ACTION,
-                    'ID de Proyecto': params.PROJECT_ID,
-                    'Región': params.REGION,
-                    'Zona': params.ZONE,
-                    'Ambiente': params.ENVIRONMENT
-                ],
-                'configuracionBaseDatos':[
-                    'Versión de Oracle': params.DB_VERSION,
-                    'Nombre de BD': params.DB_NAME,
-                    'SID': params.DB_SID,
-                    'Character Set': params.DB_CHARACTER_SET,
-                    'Usuario de BD': params.DB_USERNAME,
-                    'Conexiones Máximas': params.DB_MAX_CONNECTIONS,
-                    'Habilitar cache de datos': params.ENABLE_CACHE
-                ],
-                'configuracionRecursos':[
-                    'Tipo de Máquina': params.MACHINE_TYPE,
-                    'Tamaño de Almacenamiento': "${params.DB_STORAGE_SIZE} GB",
-                    'Tipo de Almacenamiento': params.DB_STORAGE_TYPE,
-                    'Auto Resize': params.DB_STORAGE_AUTO_RESIZE,
-                    'Tipo de Disco de Arranque': params.BOOT_DISK_TYPE,
-                    'Tamaño de Disco de Arranque': "${params.BOOT_DISK_SIZE} GB"
-                ],
-                'configuracionRed':[
-                    'Red VPC': params.VPC_NETWORK,
-                    'Subred': params.SUBNET,
-                    'IP Privada': params.DB_PRIVATE_IP_ENABLED,
-                    'Acceso Público': params.DB_PUBLIC_ACCESS_ENABLED,
-                    'Rangos IP Permitidos': params.DB_IP_RANGE_ALLOWED,
-                    'SSL Habilitado': params.DB_SSL_ENABLED
-                ],
-                'configuracionSeguridad':[
-                        'Encriptación': params.DB_ENCRYPTION_ENABLED,
-                        'Protección contra Eliminación': params.DB_DELETION_PROTECTION,
-                        'Rol IAM': params.IAM_ROLE,
-                        'Archivo de Credenciales': params.CREDENTIAL_FILE
-                ],
-                'configuracionBackup':[
-                    'Días de Retención': params.BACKUP_RETENTION_DAYS,
-                    'Hora de Inicio': params.DB_BACKUP_START_TIME,
-                    'Día de Mantenimiento': params.DB_MAINTENANCE_WINDOW_DAY,
-                    'Hora de Mantenimiento': params.DB_MAINTENANCE_WINDOW_HOUR
-                ],
-                'configuracionAltaDisponibilidad':[
-                    'Alta Disponibilidad': params.DB_HIGH_AVAILABILITY,
-                    'Auto Escalado': params.AUTO_SCALE_ENABLED,
-                    'Monitoreo Avanzado': params.DB_MONITORING_ENABLED,
-                    'Configuración de Listener': params.DB_LISTENER_CONFIG
-                ],
-            ]
-            return config
-        }
+       
 
-        def formatearConfiguracion(config) {
-            def messageText = ""
-            config.each { seccion, valores ->
-                messageText += "### ${seccion}\n"
-                valores.each { key, value ->
-                    messageText += "- **${key}:** ${value}\n"
-                }
-                messageText += "\n"
-            }
-            return messageText
-        }
+
         stage('Mostrar Configuración') {
             steps {
                 script {
