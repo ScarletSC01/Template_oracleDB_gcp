@@ -271,7 +271,7 @@ pipeline {
         )
         string(
             name: 'TICKET_JIRA', 
-            defaultValue: 'AJI-1', 
+            defaultValue: '', 
             description: 'Numero de ticket jira'
         )
     }
@@ -428,73 +428,98 @@ pipeline {
 
 
        
-        stage('Post-Jira Status') {
-            steps {
+        // stage('Post-Jira Status') {
+        //     steps {
                 
-                script {
+        //         script {
         
 
                        
-                    withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
-                        def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
-                        def response = sh(
-                            script: """
-                                curl -s -X GET '${JIRA_API_URL}${params.TICKET_JIRA}' \\
-                                -H "Authorization: Basic ${auth}" \\
-                                -H "Accept: application/json"
-                            """,
-                            returnStdout: true
-                        ).trim()
+        //             withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+        //                 def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
+        //                 def response = sh(
+        //                     script: """
+        //                         curl -s -X GET '${JIRA_API_URL}${params.TICKET_JIRA}' \\
+        //                         -H "Authorization: Basic ${auth}" \\
+        //                         -H "Accept: application/json"
+        //                     """,
+        //                     returnStdout: true
+        //                 ).trim()
                     
-                        def json = new groovy.json.JsonSlurper().parseText(response)
-                        def estado = json.fields.status.name
-                        echo "Estado actual del ticket ${params.TICKET_JIRA}: ${estado}"
-                    }
+        //                 def json = new groovy.json.JsonSlurper().parseText(response)
+        //                 def estado = json.fields.status.name
+        //                 echo "Estado actual del ticket ${params.TICKET_JIRA}: ${estado}"
+        //             }
 
         
-                }
+        //         }
         
-            }
-        }
+        //     }
+        // }
 
-        stage('Post-Coment-jira'){
-            steps{
-                script{
+        // stage('Post-Coment-jira'){
+        //     steps{
+        //         script{
                     
-                    withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
-                        def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
-                        def comentario = "Este ticket fue comentario por Lucaneitor"
+        //             withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+        //                 def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
+        //                 def comentario = "Este ticket fue comentario por Lucaneitor"
 
-                        def response = sh(
-                            script: """
-                                curl -s -X POST "${JIRA_API_URL}${params.TICKET_JIRA}/comment" \\
-                                -H "Authorization: Basic ${auth}" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{
-                                    "body": {
-                                        "type": "doc",
-                                        "version": 1,
-                                        "content": [
-                                        {
-                                            "type": "paragraph",
-                                            "content": [
-                                            {
-                                                "type": "text",
-                                                "text": "${comentario}"
-                                            }
-                                            ]
-                                        }
-                                        ]
-                                    }
-                                    }
-                                    '
-                            """,
-                            returnStdout: true
-                        ).trim()
+        //                 def response = sh(
+        //                     script: """
+        //                         curl -s -X POST "${JIRA_API_URL}${params.TICKET_JIRA}/comment" \\
+        //                         -H "Authorization: Basic ${auth}" \\
+        //                         -H "Content-Type: application/json" \\
+        //                         -d '{
+        //                             "body": {
+        //                                 "type": "doc",
+        //                                 "version": 1,
+        //                                 "content": [
+        //                                 {
+        //                                     "type": "paragraph",
+        //                                     "content": [
+        //                                     {
+        //                                         "type": "text",
+        //                                         "text": "${comentario}"
+        //                                     }
+        //                                     ]
+        //                                 }
+        //                                 ]
+        //                             }
+        //                             }
+        //                             '
+        //                     """,
+        //                     returnStdout: true
+        //                 ).trim()
 
-                        echo "Comentario enviado: ${response}"
+        //                 echo "Comentario enviado: ${response}"
+        //             }
+
+        //         }
+        //     }
+        // }
+
+
+        
+        stage('Notify Teams') {
+            steps {
+                script {
+                    def teamsWebhookUrl = 'https://accenture.webhook.office.com/webhookb2/870e2ab9-53bf-43f6-8655-376cbe11bd1c@e0793d39-0939-496d-b129-198edd916feb/IncomingWebhook/f495e4cf395c416e83eae4fb3b9069fd/b08cc148-e951-496b-9f46-3f7e35f79570/V2r0-VttaFGsrZXpm8qS18JcqaHZ26SxRAT51CZvkTR-A1'
+                    def message = """
+                    {
+                        "@type": "MessageCard",
+                        "@context": "http://schema.org/extensions",
+                        "summary": "Notificación de Jenkins",
+                        "themeColor": "0076D7",
+                        "title": "Pipeline ejecutado",
+                        "text": "Mensaje enviado desde Pipeline Jenkins* ha finalizado en el stage *Notify Teams*."
                     }
-
+                    """
+                    sh """
+                        curl -H 'Content-Type: application/json' \
+                            -d '${message}' \
+                            '${teamsWebhookUrl}'
+                    """
                 }
             }
         }
