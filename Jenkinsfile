@@ -545,7 +545,7 @@ pipeline {
             steps {
                 script {
                     
-                    // def config = new groovy.json.JsonSlurper().parseText(env.CONFIG_JSON)
+                    def config = new groovy.json.JsonSlurper().parseText(env.CONFIG_JSON)
                     def mensajeFinal = "mensaje final"
                     
                     
