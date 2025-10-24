@@ -548,66 +548,69 @@ pipeline {
                     def config = new groovy.json.JsonSlurper().parseText(env.CONFIG_JSON)
                     def mensajeFinal = ''
                     
-                    echo "${config}"
+                    
                     mensajeFinal += '\n================================================\n'
                     mensajeFinal +=  '\n      CONFIGURACIÓN PREDETERMINADA (OCULTA)    \n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionOculta.each { k, v -> mensajeFinal +=  "  ${k}: ${v}\n" }
+                    config.configuracionOculta.each { k, v -> mensajeFinal +=  " \n ${k}: ${v} \n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  '\n           CONFIGURACIÓN DE GCP                \n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionGCP.each { k, v -> mensajeFinal +=  "  ${k}: ${v}\n" }
+                    config.configuracionGCP.each { k, v -> mensajeFinal +=  " \n ${k}: ${v}\n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  '\n        CONFIGURACIÓN DE BASE DE DATOS         \n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionBaseDatos.each { k, v -> mensajeFinal +=  "  ${k}: ${v}\n" }
+                    config.configuracionBaseDatos.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  '\n         CONFIGURACIÓN DE RECURSOS             \n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionRecursos.each { k, v -> mensajeFinal +=  "  ${k}: ${v}\n" }
+                    config.configuracionRecursos.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  ' \n           CONFIGURACIÓN DE RED               \n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionRed.each { k, v -> mensajeFinal +=  "  ${k}: ${v}\n" }
+                    config.configuracionRed.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  '\n         CONFIGURACIÓN DE SEGURIDAD            \n'
                     mensajeFinal +=  '\n===============================================\n'
-                    config.configuracionSeguridad.each { k, v -> mensajeFinal +=  "  ${k}: ${v}\n" }
+                    config.configuracionSeguridad.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  '\n        CONFIGURACIÓN DE BACKUP Y MANTENIMIENTO\n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionBackup.each { k, v -> mensajeFinal +=  "  ${k}: ${v}\n" }
+                    config.configuracionBackup.each { k, v -> mensajeFinal +=  "\n ${k}: ${v}\n" }
                     
                     mensajeFinal +=  '\n================================================\n'
                     mensajeFinal +=  '\n    CONFIGURACIÓN DE ALTA DISPONIBILIDAD       \n'
                     mensajeFinal +=  '\n================================================\n'
-                    config.configuracionAltaDisponibilidad.each { k, v -> mensajeFinal +=  "  ${k}: ${v}\n" }
+                    config.configuracionAltaDisponibilidad.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
                     echo "${mensajeFinal}"
 
                     def teamsWebhookUrl = 'https://accenture.webhook.office.com/webhookb2/870e2ab9-53bf-43f6-8655-376cbe11bd1c@e0793d39-0939-496d-b129-198edd916feb/IncomingWebhook/f495e4cf395c416e83eae4fb3b9069fd/b08cc148-e951-496b-9f46-3f7e35f79570/V2r0-VttaFGsrZXpm8qS18JcqaHZ26SxRAT51CZvkTR-A1'
+
                     def mensajeTeams = """
                     {
                     "@type": "MessageCard",
                     "@context": "http://schema.org/extensions",
                     "summary": "Despliegue de base de datos Oracle",
                     "themeColor": "0076D7",
-                    "title": "Despliegue de base de datos Oracle iniciado desde Jenkins",
+                    "title": "🚀 Despliegue iniciado desde Jenkins",
                     "text": "${mensajeFinal}"                     
                    
                     }
                     """
+                    timeout(time: 2, unit: 'MINUTES') {
                     sh """
                         curl -H 'Content-Type: application/json' \
                             -d '${mensajeTeams}' \
                             '${teamsWebhookUrl}'
                     """
+                    }
                 }
             }
         }
