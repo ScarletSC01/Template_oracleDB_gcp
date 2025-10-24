@@ -399,6 +399,7 @@ pipeline {
         stage('Mostrar Configuración') {
             steps {
                 script {
+                    echo "${env.CONFIG_JSON}"
                    
                     def config = new groovy.json.JsonSlurper().parseText(env.CONFIG_JSON)
                     // Imprimir todas las configuraciones
