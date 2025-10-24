@@ -27,9 +27,6 @@ pipeline {
         // Credenciales de administrador
         DB_USER_ADMIN = 'OracleSQL'
         DB_PASSWORD_ADMIN = 'password'
-
-        //obtener todas las variables
-        
     }
     
     parameters {
@@ -383,14 +380,14 @@ pipeline {
                     
                 // Guardar todo en un solo objeto JSON para reutilizar
                     env.CONFIG_JSON = groovy.json.JsonOutput.toJson([
-                        oculta: configuracionOculta,
-                        GCP: configuracionGCP,
-                        baseDatos: configuracionBaseDatos,
-                        recursos: configuracionRecursos,
-                        red: configuracionRed,
-                        seguridad: configuracionSeguridad,
-                        backup: configuracionBackup,
-                        altaDisponibilidad: configuracionAltaDisponibilidad,
+                        configuracionOculta: configuracionOculta,
+                        configuracionGCP: configuracionGCP,
+                        configuracionBaseDatos: configuracionBaseDatos,
+                        configuracionRecursos: configuracionRecursos,
+                        configuracionRed: configuracionRed,
+                        configuracionSeguridad: configuracionSeguridad,
+                        configuracionBackup: configuracionBackup,
+                        configuracionAltaDisponibilidad: configuracionAltaDisponibilidad,
                     ])
 
                 }
