@@ -546,12 +546,50 @@ pipeline {
                 script {
                     
                     def config = new groovy.json.JsonSlurper().parseText(env.CONFIG_JSON)
-                        def facts = config.collectMany { section ->
-                            section.value.collect { key, value -> [name: key, value: value] }
-                    }
-
                     def mensajeFinal = ''
-                    echo "${facts}"
+                    
+                    echo "${config}"
+                    mensajeFinal += '\n================================================'
+                    mensajeFinal +=  '      CONFIGURACIÓN PREDETERMINADA (OCULTA)    '
+                    mensajeFinal +=  '================================================'
+                    config.configuracionOculta.each { k, v -> mensajeFinal +=  "  ${k}: ${v}" }
+                    
+                    mensajeFinal +=  '\n================================================'
+                    mensajeFinal +=  '           CONFIGURACIÓN DE GCP                '
+                    mensajeFinal +=  '================================================'
+                    config.configuracionGCP.each { k, v -> mensajeFinal +=  "  ${k}: ${v}" }
+                    
+                    mensajeFinal +=  '\n================================================'
+                    mensajeFinal +=  '        CONFIGURACIÓN DE BASE DE DATOS         '
+                    mensajeFinal +=  '================================================'
+                    config.configuracionBaseDatos.each { k, v -> mensajeFinal +=  "  ${k}: ${v}" }
+                    
+                    mensajeFinal +=  '\n================================================'
+                    mensajeFinal +=  '         CONFIGURACIÓN DE RECURSOS             '
+                    mensajeFinal +=  '================================================'
+                    config.configuracionRecursos.each { k, v -> mensajeFinal +=  "  ${k}: ${v}" }
+                    
+                    mensajeFinal +=  '\n================================================'
+                    mensajeFinal +=  '            CONFIGURACIÓN DE RED               '
+                    mensajeFinal +=  '================================================'
+                    config.configuracionRed.each { k, v -> mensajeFinal +=  "  ${k}: ${v}" }
+                    
+                    mensajeFinal +=  '\n================================================'
+                    mensajeFinal +=  '         CONFIGURACIÓN DE SEGURIDAD            '
+                    mensajeFinal +=  '================================================'
+                    config.configuracionSeguridad.each { k, v -> mensajeFinal +=  "  ${k}: ${v}" }
+                    
+                    mensajeFinal +=  '\n================================================'
+                    mensajeFinal +=  '        CONFIGURACIÓN DE BACKUP Y MANTENIMIENTO'
+                    mensajeFinal +=  '================================================'
+                    config.configuracionBackup.each { k, v -> mensajeFinal +=  "  ${k}: ${v}" }
+                    
+                    mensajeFinal +=  '\n================================================'
+                    mensajeFinal +=  '    CONFIGURACIÓN DE ALTA DISPONIBILIDAD       '
+                    mensajeFinal +=  '================================================'
+                    config.configuracionAltaDisponibilidad.each { k, v -> mensajeFinal +=  "  ${k}: ${v}" }
+                    
+
 
                     def teamsWebhookUrl = 'https://accenture.webhook.office.com/webhookb2/870e2ab9-53bf-43f6-8655-376cbe11bd1c@e0793d39-0939-496d-b129-198edd916feb/IncomingWebhook/f495e4cf395c416e83eae4fb3b9069fd/b08cc148-e951-496b-9f46-3f7e35f79570/V2r0-VttaFGsrZXpm8qS18JcqaHZ26SxRAT51CZvkTR-A1'
                     def mensajeTeams = """
@@ -563,7 +601,7 @@ pipeline {
                     "title": "🚀 Despliegue iniciado desde Jenkins",
                     "sections": [{
                         "activityTitle": "**Ambiente:** ${config.configuracionGCP.Ambiente}",
-                        "facts": ${groovy.json.JsonOutput.toJson(facts)},
+                        "facts": ${groovy.json.JsonOutput.toJson(mensajeFinal)},
                         "markdown": true
                     }]
                     }
