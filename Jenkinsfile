@@ -348,25 +348,25 @@ pipeline {
                     'Acceso Público': params.DB_PUBLIC_ACCESS_ENABLED,
                     'Rangos IP Permitidos': params.DB_IP_RANGE_ALLOWED,
                     'SSL Habilitado': params.DB_SSL_ENABLED
-                ]
+                ],
                 'configuracionSeguridad':[
                         'Encriptación': params.DB_ENCRYPTION_ENABLED,
                         'Protección contra Eliminación': params.DB_DELETION_PROTECTION,
                         'Rol IAM': params.IAM_ROLE,
                         'Archivo de Credenciales': params.CREDENTIAL_FILE
-                ]
+                ],
                 'configuracionBackup':[
                     'Días de Retención': params.BACKUP_RETENTION_DAYS,
                     'Hora de Inicio': params.DB_BACKUP_START_TIME,
                     'Día de Mantenimiento': params.DB_MAINTENANCE_WINDOW_DAY,
                     'Hora de Mantenimiento': params.DB_MAINTENANCE_WINDOW_HOUR
-                ]
+                ],
                 'configuracionAltaDisponibilidad':[
                     'Alta Disponibilidad': params.DB_HIGH_AVAILABILITY,
                     'Auto Escalado': params.AUTO_SCALE_ENABLED,
                     'Monitoreo Avanzado': params.DB_MONITORING_ENABLED,
                     'Configuración de Listener': params.DB_LISTENER_CONFIG
-                ]
+                ],
             ]
             return config
         }
