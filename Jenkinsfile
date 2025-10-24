@@ -546,7 +546,7 @@ pipeline {
                 script {
                     
                     def config = new groovy.json.JsonSlurper().parseText(env.CONFIG_JSON)
-                    def mensajeFinal = ''
+                    def mensajeFinal = ""
                     
                     
                     mensajeFinal += '\n================================================\n'
@@ -554,40 +554,40 @@ pipeline {
                     mensajeFinal +=  '\n================================================\n'
                     config.configuracionOculta.each { k, v -> mensajeFinal +=  " \n ${k}: ${v} \n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  '\n           CONFIGURACIÓN DE GCP                \n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionGCP.each { k, v -> mensajeFinal +=  " \n ${k}: ${v}\n" }
+                    // mensajeFinal +=  '\n================================================\n'
+                    // mensajeFinal +=  '\n           CONFIGURACIÓN DE GCP                \n'
+                    // mensajeFinal +=  '\n================================================\n'
+                    // config.configuracionGCP.each { k, v -> mensajeFinal +=  " \n ${k}: ${v}\n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  '\n        CONFIGURACIÓN DE BASE DE DATOS         \n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionBaseDatos.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
+                    // mensajeFinal +=  '\n================================================\n'
+                    // mensajeFinal +=  '\n        CONFIGURACIÓN DE BASE DE DATOS         \n'
+                    // mensajeFinal +=  '\n================================================\n'
+                    // config.configuracionBaseDatos.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  '\n         CONFIGURACIÓN DE RECURSOS             \n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionRecursos.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
+                    // mensajeFinal +=  '\n================================================\n'
+                    // mensajeFinal +=  '\n         CONFIGURACIÓN DE RECURSOS             \n'
+                    // mensajeFinal +=  '\n================================================\n'
+                    // config.configuracionRecursos.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  ' \n           CONFIGURACIÓN DE RED               \n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionRed.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
+                    // mensajeFinal +=  '\n================================================\n'
+                    // mensajeFinal +=  ' \n           CONFIGURACIÓN DE RED               \n'
+                    // mensajeFinal +=  '\n================================================\n'
+                    // config.configuracionRed.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  '\n         CONFIGURACIÓN DE SEGURIDAD            \n'
-                    mensajeFinal +=  '\n===============================================\n'
-                    config.configuracionSeguridad.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
+                    // mensajeFinal +=  '\n================================================\n'
+                    // mensajeFinal +=  '\n         CONFIGURACIÓN DE SEGURIDAD            \n'
+                    // mensajeFinal +=  '\n===============================================\n'
+                    // config.configuracionSeguridad.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  '\n        CONFIGURACIÓN DE BACKUP Y MANTENIMIENTO\n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionBackup.each { k, v -> mensajeFinal +=  "\n ${k}: ${v}\n" }
+                    // mensajeFinal +=  '\n================================================\n'
+                    // mensajeFinal +=  '\n        CONFIGURACIÓN DE BACKUP Y MANTENIMIENTO\n'
+                    // mensajeFinal +=  '\n================================================\n'
+                    // config.configuracionBackup.each { k, v -> mensajeFinal +=  "\n ${k}: ${v}\n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  '\n    CONFIGURACIÓN DE ALTA DISPONIBILIDAD       \n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionAltaDisponibilidad.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
+                    // mensajeFinal +=  '\n================================================\n'
+                    // mensajeFinal +=  '\n    CONFIGURACIÓN DE ALTA DISPONIBILIDAD       \n'
+                    // mensajeFinal +=  '\n================================================\n'
+                    // config.configuracionAltaDisponibilidad.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
                     
                     echo "${mensajeFinal}"
 
