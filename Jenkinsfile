@@ -27,6 +27,9 @@ pipeline {
         // Credenciales de administrador
         DB_USER_ADMIN = 'OracleSQL'
         DB_PASSWORD_ADMIN = 'password'
+
+        //obtener todas las variables
+        CONFIG_JSON = ''
     }
     
     parameters {
@@ -275,84 +278,7 @@ pipeline {
             description: 'Numero de ticket jira'
         )
     }
-     def getConfiguracionCompleta(){
-        def config = [
-            'ConfiguracionOculta':[
-                'País': env.PAIS,
-                'Proveedor de Servicio': env.DB_SERVICE_PROVIDER,
-                'Motor de Base de Datos': env.DB_ENGINE,
-                'Backup Habilitado': env.DB_BACKUP_ENABLED,
-                'Zona Horaria': env.DB_TIME_ZONE,
-                'Etiquetas de Recursos': env.DB_RESOURCE_LABELS,
-                'Tags': env.DB_TAGS,
-                'Usuario de Plataforma': env.DB_PLATFORM_USER,
-                'Usuario Administrador': env.DB_USER_ADMIN
-            ],
-            'configuracionGCP':[
-                'Ticket Jira' : params.TICKET_JIRA,
-                'Acción a realizar' : params.ACTION,
-                'ID de Proyecto': params.PROJECT_ID,
-                'Región': params.REGION,
-                'Zona': params.ZONE,
-                'Ambiente': params.ENVIRONMENT
-            ],
-            'configuracionBaseDatos':[
-                'Versión de Oracle': params.DB_VERSION,
-                'Nombre de BD': params.DB_NAME,
-                'SID': params.DB_SID,
-                'Character Set': params.DB_CHARACTER_SET,
-                'Usuario de BD': params.DB_USERNAME,
-                'Conexiones Máximas': params.DB_MAX_CONNECTIONS,
-                'Habilitar cache de datos': params.ENABLE_CACHE
-            ],
-            'configuracionRecursos':[
-                'Tipo de Máquina': params.MACHINE_TYPE,
-                'Tamaño de Almacenamiento': "${params.DB_STORAGE_SIZE} GB",
-                'Tipo de Almacenamiento': params.DB_STORAGE_TYPE,
-                'Auto Resize': params.DB_STORAGE_AUTO_RESIZE,
-                'Tipo de Disco de Arranque': params.BOOT_DISK_TYPE,
-                'Tamaño de Disco de Arranque': "${params.BOOT_DISK_SIZE} GB"
-            ],
-            'configuracionRed':[
-                'Red VPC': params.VPC_NETWORK,
-                'Subred': params.SUBNET,
-                'IP Privada': params.DB_PRIVATE_IP_ENABLED,
-                'Acceso Público': params.DB_PUBLIC_ACCESS_ENABLED,
-                'Rangos IP Permitidos': params.DB_IP_RANGE_ALLOWED,
-                'SSL Habilitado': params.DB_SSL_ENABLED
-            ],
-            'configuracionSeguridad':[
-                    'Encriptación': params.DB_ENCRYPTION_ENABLED,
-                    'Protección contra Eliminación': params.DB_DELETION_PROTECTION,
-                    'Rol IAM': params.IAM_ROLE,
-                    'Archivo de Credenciales': params.CREDENTIAL_FILE
-            ],
-            'configuracionBackup':[
-                'Días de Retención': params.BACKUP_RETENTION_DAYS,
-                'Hora de Inicio': params.DB_BACKUP_START_TIME,
-                'Día de Mantenimiento': params.DB_MAINTENANCE_WINDOW_DAY,
-                'Hora de Mantenimiento': params.DB_MAINTENANCE_WINDOW_HOUR
-            ],
-            'configuracionAltaDisponibilidad':[
-                'Alta Disponibilidad': params.DB_HIGH_AVAILABILITY,
-                'Auto Escalado': params.AUTO_SCALE_ENABLED,
-                'Monitoreo Avanzado': params.DB_MONITORING_ENABLED,
-                'Configuración de Listener': params.DB_LISTENER_CONFIG
-            ],
-        ]
-        return config
-    }
-    def formatearConfiguracion(config) {
-        def messageText = ""
-        config.each { seccion, valores ->
-            messageText += "### ${seccion}\n"
-            valores.each { key, value ->
-                messageText += "- **${key}:** ${value}\n"
-            }
-            messageText += "\n"
-        }
-        return messageText
-    }
+    
     stages {
         stage('Validación de Parámetros') {
             steps {
@@ -380,28 +306,145 @@ pipeline {
             }
         }
         
-       
+    
+        stage('Capturar Configuración'){
+            steps{
+                script{
+                     def configuracionOculta = [
+                        'País': env.PAIS,
+                        'Proveedor de Servicio': env.DB_SERVICE_PROVIDER,
+                        'Motor de Base de Datos': env.DB_ENGINE,
+                        'Backup Habilitado': env.DB_BACKUP_ENABLED,
+                        'Zona Horaria': env.DB_TIME_ZONE,
+                        'Etiquetas de Recursos': env.DB_RESOURCE_LABELS,
+                        'Tags': env.DB_TAGS,
+                        'Usuario de Plataforma': env.DB_PLATFORM_USER,
+                        'Usuario Administrador': env.DB_USER_ADMIN
+                    ]
 
+                    def configuracionGCP = [
+                        'Ticket Jira' : params.TICKET_JIRA,
+                        'Acción a realizar' : params.ACTION,
+                        'ID de Proyecto': params.PROJECT_ID,
+                        'Región': params.REGION,
+                        'Zona': params.ZONE,
+                        'Ambiente': params.ENVIRONMENT
+                    ]
+                    
+                    def configuracionBaseDatos = [
+                        'Versión de Oracle': params.DB_VERSION,
+                        'Nombre de BD': params.DB_NAME,
+                        'SID': params.DB_SID,
+                        'Character Set': params.DB_CHARACTER_SET,
+                        'Usuario de BD': params.DB_USERNAME,
+                        'Conexiones Máximas': params.DB_MAX_CONNECTIONS,
+                        'Habilitar cache de datos': params.ENABLE_CACHE
+                    ]
+                    
+                    def configuracionRecursos = [
+                        'Tipo de Máquina': params.MACHINE_TYPE,
+                        'Tamaño de Almacenamiento': "${params.DB_STORAGE_SIZE} GB",
+                        'Tipo de Almacenamiento': params.DB_STORAGE_TYPE,
+                        'Auto Resize': params.DB_STORAGE_AUTO_RESIZE,
+                        'Tipo de Disco de Arranque': params.BOOT_DISK_TYPE,
+                        'Tamaño de Disco de Arranque': "${params.BOOT_DISK_SIZE} GB"
+                    ]
+                    
+                    def configuracionRed = [
+                        'Red VPC': params.VPC_NETWORK,
+                        'Subred': params.SUBNET,
+                        'IP Privada': params.DB_PRIVATE_IP_ENABLED,
+                        'Acceso Público': params.DB_PUBLIC_ACCESS_ENABLED,
+                        'Rangos IP Permitidos': params.DB_IP_RANGE_ALLOWED,
+                        'SSL Habilitado': params.DB_SSL_ENABLED
+                    ]
+                    
+                    def configuracionSeguridad = [
+                        'Encriptación': params.DB_ENCRYPTION_ENABLED,
+                        'Protección contra Eliminación': params.DB_DELETION_PROTECTION,
+                        'Rol IAM': params.IAM_ROLE,
+                        'Archivo de Credenciales': params.CREDENTIAL_FILE
+                    ]
+                    
+                    def configuracionBackup = [
+                        'Días de Retención': params.BACKUP_RETENTION_DAYS,
+                        'Hora de Inicio': params.DB_BACKUP_START_TIME,
+                        'Día de Mantenimiento': params.DB_MAINTENANCE_WINDOW_DAY,
+                        'Hora de Mantenimiento': params.DB_MAINTENANCE_WINDOW_HOUR
+                    ]
+                    
+                    def configuracionAltaDisponibilidad = [
+                        'Alta Disponibilidad': params.DB_HIGH_AVAILABILITY,
+                        'Auto Escalado': params.AUTO_SCALE_ENABLED,
+                        'Monitoreo Avanzado': params.DB_MONITORING_ENABLED,
+                        'Configuración de Listener': params.DB_LISTENER_CONFIG
+                    ]
 
+                    
+                // Guardar todo en un solo objeto JSON para reutilizar
+                    env.CONFIG_JSON = groovy.json.JsonOutput.toJson([
+                        oculta: configuracionOculta
+                        configuracionGCP: configuracionGCP,
+                        configuracionBaseDatos: configuracionBaseDatos,
+                        configuracionRecursos: configuracionRecursos,
+                        configuracionRed: configuracionRed,
+                        configuracionSeguridad: configuracionSeguridad,
+                        configuracionBackup: configuracionBackup,
+                        configuracionAltaDisponibilidad: configuracionAltaDisponibilidad,
+                    ])
+
+                }
+            }
+        }
         stage('Mostrar Configuración') {
             steps {
                 script {
-                    def config = getConfiguracionCompleta()
-                    def timestamp = new Date().format('dd/MM/yyyy HH:mm:ss')
+                   
+                    def config = new groovy.json.JsonSlurper().parseText(env.CONFIG_JSON)
+                    // Imprimir todas las configuraciones
+                    echo '\n================================================'
+                    echo '      CONFIGURACIÓN PREDETERMINADA (OCULTA)    '
+                    echo '================================================'
+                    config.configuracionOculta.each { k, v -> echo "  ${k}: ${v}" }
                     
-                    echo "📋 EVIDENCIA DE CONFIGURACIÓN - ${timestamp}"
-                    echo "================================================"
+                    echo '\n================================================'
+                    echo '           CONFIGURACIÓN DE GCP                '
+                    echo '================================================'
+                    config.configuracionGCP.each { k, v -> echo "  ${k}: ${v}" }
                     
-                    config.each { seccion, valores ->
-                        echo "\n🔹 ${seccion}"
-                        echo "------------------------------------------------"
-                        valores.each { k, v -> 
-                            echo "  ▪ ${k}: ${v}"
-                        }
-                    }
+                    echo '\n================================================'
+                    echo '        CONFIGURACIÓN DE BASE DE DATOS         '
+                    echo '================================================'
+                    config.configuracionBaseDatos.each { k, v -> echo "  ${k}: ${v}" }
                     
-                    // Guardar la configuración para uso posterior
-                    env.CONFIGURACION_FORMATTED = formatearConfiguracion(config)
+                    echo '\n================================================'
+                    echo '         CONFIGURACIÓN DE RECURSOS             '
+                    echo '================================================'
+                    config.configuracionRecursos.each { k, v -> echo "  ${k}: ${v}" }
+                    
+                    echo '\n================================================'
+                    echo '            CONFIGURACIÓN DE RED               '
+                    echo '================================================'
+                    config.configuracionRed.each { k, v -> echo "  ${k}: ${v}" }
+                    
+                    echo '\n================================================'
+                    echo '         CONFIGURACIÓN DE SEGURIDAD            '
+                    echo '================================================'
+                    config.configuracionSeguridad.each { k, v -> echo "  ${k}: ${v}" }
+                    
+                    echo '\n================================================'
+                    echo '        CONFIGURACIÓN DE BACKUP Y MANTENIMIENTO'
+                    echo '================================================'
+                    config.configuracionBackup.each { k, v -> echo "  ${k}: ${v}" }
+                    
+                    echo '\n================================================'
+                    echo '    CONFIGURACIÓN DE ALTA DISPONIBILIDAD       '
+                    echo '================================================'
+                    config.configuracionAltaDisponibilidad.each { k, v -> echo "  ${k}: ${v}" }
+                    
+                    echo '\n================================================'
+                    echo '     CONFIGURACIÓN COMPLETADA                  '
+                    echo '================================================\n'
                 }
             }
         }
@@ -500,54 +543,45 @@ pipeline {
         //     }
         // }
             
+        
         stage('Notify Teams') {
             steps {
                 script {
-                    def timestamp = new Date().format('dd/MM/yyyy HH:mm:ss')
-                    def teamsWebhookUrl = 'https://accenture.webhook.office.com/webhookb2/870e2ab9-53bf-43f6-8655-376cbe11bd1c@e0793d39-0939-496d-b129-198edd916feb/IncomingWebhook/f495e4cf395c416e83eae4fb3b9069fd/b08cc148-e951-496b-9f46-3f7e35f79570/V2r0-VttaFGsrZXpm8qS18JcqaHZ26SxRAT51CZvkTR-A1'
                     
-                    def message = """
-                    {
-                        "@type": "MessageCard",
-                        "@context": "http://schema.org/extensions",
-                        "summary": "Evidencia de Configuración",
-                        "themeColor": "0076D7",
-                        "title": "📋 Evidencia de Configuración - Base de Datos Oracle",
-                        "sections": [
-                            {
-                                "activityTitle": "Detalles de la Ejecución",
-                                "activitySubtitle": "Fecha: ${timestamp}",
-                                "facts": [
-                                    {
-                                        "name": "Ticket Jira",
-                                        "value": "${params.TICKET_JIRA}"
-                                    },
-                                    {
-                                        "name": "Acción",
-                                        "value": "${params.ACTION}"
-                                    },
-                                    {
-                                        "name": "Ambiente",
-                                        "value": "${params.ENVIRONMENT}"
-                                    }
-                                ],
-                                "text": ${groovy.json.JsonOutput.toJson(env.CONFIGURACION_FORMATTED)}
-                            }
-                        ]
+                    def config = new groovy.json.JsonSlurper().parseText(env.CONFIG_JSON)
+                        def facts = config.collectMany { section ->
+                            section.value.collect { key, value -> [name: key, value: value] }
                     }
+
+                    def mensajeFinal = ''
+                    
+
+                    def teamsWebhookUrl = 'https://accenture.webhook.office.com/webhookb2/870e2ab9-53bf-43f6-8655-376cbe11bd1c@e0793d39-0939-496d-b129-198edd916feb/IncomingWebhook/f495e4cf395c416e83eae4fb3b9069fd/b08cc148-e951-496b-9f46-3f7e35f79570/V2r0-VttaFGsrZXpm8qS18JcqaHZ26SxRAT51CZvkTR-A1'
+                    def message = """
+                   
+                    {
+                      "@type": "MessageCard",
+                      "@context": "http://schema.org/extensions",
+                      "summary": "Despliegue de base de datos Oracle",
+                      "themeColor": "0076D7",
+                      "title": "🚀 Despliegue iniciado desde Jenkins",
+                      "sections": [{
+                        "activityTitle": "**Ambiente:** ${config.general.ENVIRONMENT}",
+                        "facts": ${groovy.json.JsonOutput.toJson(facts)},
+                        "markdown": true
+                      }]
+                    }
+
                     """
-
-                    // Escapar caracteres especiales para curl
-                    message = message.replaceAll('"', '\\\\"')
-
                     sh """
                         curl -H 'Content-Type: application/json' \
-                            -d "${message}" \
+                            -d '${message}' \
                             '${teamsWebhookUrl}'
                     """
                 }
             }
         }
+
 
 
     //     stage('Terraform Init') {
