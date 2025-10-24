@@ -550,9 +550,9 @@ pipeline {
                     
                     
                     mensajeFinal += '\n================================================\n'
-                    mensajeFinal +=  '\n      CONFIGURACIÓN PREDETERMINADA (OCULTA)    \n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionOculta.each { k, v -> mensajeFinal +=  " \n ${k}: ${v} \n" }
+                    // mensajeFinal +=  '\n      CONFIGURACIÓN PREDETERMINADA (OCULTA)    \n'
+                    // mensajeFinal +=  '\n================================================\n'
+                    // config.configuracionOculta.each { k, v -> mensajeFinal +=  " \n ${k}: ${v} \n" }
                     
                     // mensajeFinal +=  '\n================================================\n'
                     // mensajeFinal +=  '\n           CONFIGURACIÓN DE GCP                \n'
