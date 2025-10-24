@@ -396,8 +396,7 @@ pipeline {
         stage('Mostrar Configuración') {
             steps {
                 script {
-                    echo "${env.CONFIG_JSON}"
-                   
+
                     def config = new groovy.json.JsonSlurper().parseText(env.CONFIG_JSON)
                     // Imprimir todas las configuraciones
                     echo '\n================================================'
@@ -552,24 +551,22 @@ pipeline {
                     }
 
                     def mensajeFinal = ''
-                    
+                    echo "${facts}"
 
                     def teamsWebhookUrl = 'https://accenture.webhook.office.com/webhookb2/870e2ab9-53bf-43f6-8655-376cbe11bd1c@e0793d39-0939-496d-b129-198edd916feb/IncomingWebhook/f495e4cf395c416e83eae4fb3b9069fd/b08cc148-e951-496b-9f46-3f7e35f79570/V2r0-VttaFGsrZXpm8qS18JcqaHZ26SxRAT51CZvkTR-A1'
-                    def message = """
-                   
+                    def mensajeTeams = """
                     {
-                      "@type": "MessageCard",
-                      "@context": "http://schema.org/extensions",
-                      "summary": "Despliegue de base de datos Oracle",
-                      "themeColor": "0076D7",
-                      "title": "🚀 Despliegue iniciado desde Jenkins",
-                      "sections": [{
+                    "@type": "MessageCard",
+                    "@context": "http://schema.org/extensions",
+                    "summary": "Despliegue de base de datos Oracle",
+                    "themeColor": "0076D7",
+                    "title": "🚀 Despliegue iniciado desde Jenkins",
+                    "sections": [{
                         "activityTitle": "**Ambiente:** ${config.configuracionGCP.Ambiente}",
                         "facts": ${groovy.json.JsonOutput.toJson(facts)},
                         "markdown": true
-                      }]
+                    }]
                     }
-
                     """
                     sh """
                         curl -H 'Content-Type: application/json' \
