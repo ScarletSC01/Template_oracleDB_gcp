@@ -601,7 +601,7 @@ pipeline {
                     "title": "🚀 Despliegue iniciado desde Jenkins",
                     "sections": [{
                         "activityTitle": "**Ambiente:** ${config.configuracionGCP.Ambiente}",
-                        "facts": ${groovy.json.JsonOutput.toJson(mensajeFinal)},
+                        "facts": ${mensajeFinal},
                         "markdown": true
                     }]
                     }
