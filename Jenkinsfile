@@ -443,7 +443,7 @@ pipeline {
                     
                     echo "${mensajeFinal}"
 
-                    env.mensaje-teams = mensajeFinal
+                    env.mensajeAteams = mensajeFinal
 
                 }
             }
