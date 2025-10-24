@@ -554,7 +554,7 @@ pipeline {
                     "@context": "http://schema.org/extensions",
                     "summary": "Notificación de Jenkins",
                     "themeColor": "0076D7",
-                    "title": "Pipeline ejecutado",
+                    "title": "Despliegue de base de datos iniciado desde Jenkins",
                     "text": "${env.mensajeAteams}"
                 }
                 """
