@@ -605,7 +605,7 @@ pipeline {
                                 "fields": {
                                     "project": { "key": "${proyect}" },
                                     "summary": "${sumary}",
-                                    "description": "${env.mensajeprueba}",
+                                    "description": "${env.mensaje}",
                                     "issuetype": { 
                                         "self": "https://bancoripley1.atlassian.net/rest/api/3/issuetype/14898",
                                         "id": "${issuetype}" 
