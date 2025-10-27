@@ -593,7 +593,9 @@ pipeline {
                         def sumary = "Creación de Instacia base de datos Oracle"
                         def issuetype = "14898"
                         
-
+                        def  field = """
+                        
+                         """
                         def response = sh(
                             script: """
                             curl -s -X POST "${JIRA_API_URL}" \
@@ -609,7 +611,7 @@ pipeline {
                                         "projectTypeKey": "software",
                                     },
                                     "summary": "${sumary}",
-                                    "description": "prueba",
+                                    "description": "${env.mensaje}",
                                     "issuetype": { 
                                         "self": "https://bancoripley1.atlassian.net/rest/api/3/issuetype/14898",
                                         "id": "${issuetype}" 
@@ -617,7 +619,8 @@ pipeline {
                                         "avatarId": 10318,
                                         "entityId": "960bc890-aa67-4d2b-8814-3926d66a6c41",
                                     }
-                                }'
+                                }
+                            }'
                             """,
                             returnStdout: true
                             ).trim()
