@@ -599,7 +599,7 @@ pipeline {
                         fields: [
                             project: [ key: proyect ],
                             summary: sumary,
-                            description: prueba",
+                            description: "prueba",
                             issuetype: [ id: issuetype ]
                         ]
                     ]
