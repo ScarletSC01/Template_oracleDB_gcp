@@ -296,7 +296,7 @@ pipeline {
                     // }
                     // if(!params.ACTION?.trim()){
                     //     error('ERROR: ACTION es obligatorio')
-                    }
+                    // }
                     
                     echo 'Validación de parámetros completada exitosamente'
                 }
