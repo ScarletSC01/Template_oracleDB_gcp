@@ -595,15 +595,27 @@ pipeline {
                         def issuetype = "14898"
                         
                         // Construir el payload como mapa
+
                         def payloadMap = [
                             fields: [
                                 project: [ key: proyect ],
                                 summary: sumary,
-                                description: "Descripción disponible",
+                                description: [
+                                    type: "doc",
+                                    version: 1,
+                                    content: [
+                                        [
+                                            type: "paragraph",
+                                            content: [
+                                                [ type: "text", text: env.mensaje ?: "Descripción no disponible" ]
+                                            ]
+                                        ]
+                                    ]
+                                ],
                                 issuetype: [ id: issuetype ]
                             ]
                         ]
-                        
+
                         // Convertir a JSON válido
                         def payloadJson = groovy.json.JsonOutput.toJson(payloadMap)
                         
