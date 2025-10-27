@@ -426,7 +426,7 @@ pipeline {
                     capturarParametros +=  '\n================================================\n'
                     config.configuracionRed.each { k, v -> capturarParametros +=  "\n  ${k}: ${v}\n" }
                     
-                    mensacapturarParametrosjeFinal +=  '\n================================================\n'
+                    capturarParametros +=  '\n================================================\n'
                     capturarParametros +=  '\n         CONFIGURACIÓN DE SEGURIDAD            \n'
                     capturarParametros +=  '\n===============================================\n'
                     config.configuracionSeguridad.each { k, v -> capturarParametros +=  "\n  ${k}: ${v}\n" }
