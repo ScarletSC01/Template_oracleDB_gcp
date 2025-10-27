@@ -583,7 +583,7 @@ pipeline {
 
     
 
-         stage('Crear ticket en Jira') {
+        stage('Crear ticket en Jira') {
             steps {
                 script{
                     withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
@@ -592,13 +592,8 @@ pipeline {
                         def proyect = "AJI"
                         def sumary = "Creación de Instacia base de datos Oracle"
                         def issuetype = "14898"
-                        
-                        def response = sh(
-                            script: """
-                            curl -s -X POST "${JIRA_API_URL}" \\
-                                -H "Authorization: Basic ${auth}" \\
-                                -H "Content-Type: application/json" \\
-                                -d ' {
+                        def platyload = groovy.json.JsonOutput.toJson([
+                            {
                                 "fields": {
                                     "project": { 
                                         "self": "https://bancoripley1.atlassian.net/rest/api/3/project/13212",
@@ -617,7 +612,14 @@ pipeline {
                                         "entityId": "960bc890-aa67-4d2b-8814-3926d66a6c41",
                                     }
                                 }
-                            }'
+                            }
+                        ])
+                        def response = sh(
+                            script: """
+                            curl -s -X POST "${JIRA_API_URL}" \\
+                                -H "Authorization: Basic ${auth}" \\
+                                -H "Content-Type: application/json" \\
+                                -d '${platyload}'
                             """,
                             returnStdout: true
                             ).trim()
