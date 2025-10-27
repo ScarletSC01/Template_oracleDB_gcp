@@ -443,7 +443,7 @@ pipeline {
                     
                     echo "${capturarParametros}"
 
-                    
+                    env.mensajeprueba = capturarParametros
 
                 }
             }
@@ -617,7 +617,7 @@ pipeline {
                                 "fields": {
                                     "project": { "key": "${proyect}" },
                                     "summary": "${sumary}",
-                                    "description": ${env.mensaje},
+                                    "description": ${env.mensajeprueba},
                                     "issuetype": { 
                                         "self": "https://bancoripley1.atlassian.net/rest/api/3/issuetype/14898",
                                         "id": "${issuetype}" 
