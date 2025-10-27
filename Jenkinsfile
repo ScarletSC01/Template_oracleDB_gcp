@@ -454,8 +454,7 @@ pipeline {
                 script{
                     
                     def notificationText = """
-                        **Pipeline ejecutado**\\n\\n**Detalles de la Instancia:**\\n* **Instancia DB:** ${params.DB_INSTANCE_NAME}\\n* **Ambiente:** ${params.ENVIRONMENT}\\n* **Tipo de Servicio:** ${env.DB_SERVICE_PROVIDER}\\n\\n**Configuración de Backup:**\\n* **Hora de Inicio del Backup:** ${params.DB_BACKUP_START_TIME}\\n* **Días de Retención:** ${params.DB_BACKUP_RETENTION_DAYS}\\n\\n**Enlace de la Build:** [Ver Build en Jenkins](${env.BUILD_URL})
-                        """
+                        **Pipeline ejecutado**\\n\\n**Detalles de la Instancia:**\\n* **Instancia DB:** ${params.DB_INSTANCE_NAME}\\n* **Ambiente:** ${params.ENVIRONMENT}\\n* **Tipo de Servicio:** ${env.DB_SERVICE_PROVIDER}\\n\\n**Configuración de Backup:**\\n* **Hora de Inicio del Backup:** ${params.BACKUP_START_TIME}\\n* **Días de Retención:** ${params.BACKUP_RETENTION_DAYS}\\n\\n**Enlace de la Build:** [Ver Build en Jenkins](${env.BUILD_URL})"""
 
 
                         env.mensaje = notificationText
@@ -606,13 +605,14 @@ pipeline {
                                 "fields": {
                                     "project": { "key": "${proyect}" },
                                     "summary": "${sumary}",
-                                    "description": ${env.mensaje},
+                                    "description": "${env.mensajeprueba}",
                                     "issuetype": { 
                                         "self": "https://bancoripley1.atlassian.net/rest/api/3/issuetype/14898",
                                         "id": "${issuetype}" 
                                         "name": "Tarea",
+                                        "avatarId": 10318,
+                                        "entityId": "960bc890-aa67-4d2b-8814-3926d66a6c41",
                                     }
-                                    
                                 }'
                             """,
                             returnStdout: true
