@@ -592,8 +592,7 @@ pipeline {
                         def proyect = "AJI"
                         def sumary = "Creación de Instacia base de datos Oracle"
                         def issuetype = "14898"
-                        def platyload = groovy.json.JsonOutput.toJson([
-                            {
+                        def platyload =  """{
                                 "fields": {
                                     "project": { 
                                         "self": "https://bancoripley1.atlassian.net/rest/api/3/project/13212",
@@ -612,14 +611,16 @@ pipeline {
                                         "entityId": "960bc890-aa67-4d2b-8814-3926d66a6c41",
                                     }
                                 }
-                            }
-                        ])
+                            }"""
+                        
+                        
+                        platyloadJaon = groovy.json.JsonOutput.toJson([ platyload])
                         def response = sh(
                             script: """
                             curl -s -X POST "${JIRA_API_URL}" \\
                                 -H "Authorization: Basic ${auth}" \\
                                 -H "Content-Type: application/json" \\
-                                -d '${platyload}'
+                                -d '${platyloadJaon}'
                             """,
                             returnStdout: true
                             ).trim()
