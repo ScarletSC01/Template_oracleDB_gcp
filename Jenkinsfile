@@ -398,57 +398,80 @@ pipeline {
                 script {
 
                     def config = new groovy.json.JsonSlurper().parseText(env.CONFIG_JSON)
-                    def mensajeFinal = ""
+                    def capturarParametros = ""
                     
                     
-                    mensajeFinal += '\n================================================\n'
-                    mensajeFinal +=  '\n      CONFIGURACIÓN PREDETERMINADA (OCULTA)    \n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionOculta.each { k, v -> mensajeFinal +=  " \n ${k}: ${v} \n" }
+                    capturarParametros += '\n================================================\n'
+                    capturarParametros +=  '\n      CONFIGURACIÓN PREDETERMINADA (OCULTA)    \n'
+                    capturarParametros +=  '\n================================================\n'
+                    config.configuracionOculta.each { k, v -> capturarParametros +=  " \n ${k}: ${v} \n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  '\n           CONFIGURACIÓN DE GCP                \n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionGCP.each { k, v -> mensajeFinal +=  " \n ${k}: ${v}\n" }
+                    capturarParametros +=  '\n================================================\n'
+                    capturarParametros +=  '\n           CONFIGURACIÓN DE GCP                \n'
+                    capturarParametros +=  '\n================================================\n'
+                    config.configuracionGCP.each { k, v -> capturarParametros +=  " \n ${k}: ${v}\n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  '\n        CONFIGURACIÓN DE BASE DE DATOS         \n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionBaseDatos.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
+                    capturarParametros +=  '\n================================================\n'
+                    capturarParametros +=  '\n        CONFIGURACIÓN DE BASE DE DATOS         \n'
+                    capturarParametros +=  '\n================================================\n'
+                    config.configuracionBaseDatos.each { k, v -> capturarParametros +=  "\n  ${k}: ${v}\n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  '\n         CONFIGURACIÓN DE RECURSOS             \n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionRecursos.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
+                    capturarParametros +=  '\n================================================\n'
+                    capturarParametros +=  '\n         CONFIGURACIÓN DE RECURSOS             \n'
+                    capturarParametros +=  '\n================================================\n'
+                    config.configuracionRecursos.each { k, v -> capturarParametros +=  "\n  ${k}: ${v}\n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  ' \n           CONFIGURACIÓN DE RED               \n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionRed.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
+                    capturarParametros +=  '\n================================================\n'
+                    capturarParametros +=  ' \n           CONFIGURACIÓN DE RED               \n'
+                    capturarParametros +=  '\n================================================\n'
+                    config.configuracionRed.each { k, v -> capturarParametros +=  "\n  ${k}: ${v}\n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  '\n         CONFIGURACIÓN DE SEGURIDAD            \n'
-                    mensajeFinal +=  '\n===============================================\n'
-                    config.configuracionSeguridad.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
+                    mensacapturarParametrosjeFinal +=  '\n================================================\n'
+                    capturarParametros +=  '\n         CONFIGURACIÓN DE SEGURIDAD            \n'
+                    capturarParametros +=  '\n===============================================\n'
+                    config.configuracionSeguridad.each { k, v -> capturarParametros +=  "\n  ${k}: ${v}\n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  '\n        CONFIGURACIÓN DE BACKUP Y MANTENIMIENTO\n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionBackup.each { k, v -> mensajeFinal +=  "\n ${k}: ${v}\n" }
+                    capturarParametros +=  '\n================================================\n'
+                    capturarParametros +=  '\n        CONFIGURACIÓN DE BACKUP Y MANTENIMIENTO\n'
+                    capturarParametros +=  '\n================================================\n'
+                    config.configuracionBackup.each { k, v -> capturarParametros +=  "\n ${k}: ${v}\n" }
                     
-                    mensajeFinal +=  '\n================================================\n'
-                    mensajeFinal +=  '\n    CONFIGURACIÓN DE ALTA DISPONIBILIDAD       \n'
-                    mensajeFinal +=  '\n================================================\n'
-                    config.configuracionAltaDisponibilidad.each { k, v -> mensajeFinal +=  "\n  ${k}: ${v}\n" }
+                    capturarParametros +=  '\n================================================\n'
+                    capturarParametros +=  '\n    CONFIGURACIÓN DE ALTA DISPONIBILIDAD       \n'
+                    capturarParametros +=  '\n================================================\n'
+                    config.configuracionAltaDisponibilidad.each { k, v -> capturarParametros +=  "\n  ${k}: ${v}\n" }
                     
-                    echo "${mensajeFinal}"
+                    echo "${capturarParametros}"
 
-                    env.mensajeAteams = mensajeFinal
+                    
 
                 }
             }
         }
-        
+        stage("Mensaje para Teams y Jira"){
+            steps{
+                script{
+                    
+                    def notificationText = """
+                        **Pipeline ejecutado**
+
+                        **Detalles de la Instancia:**
+                        * **Instancia DB:** ${params.DB_INSTANCE_NAME}
+                        * **Ambiente:** ${params.ENVIRONMENT}
+                        * **Tipo de Servicio:** ${env.DB_SERVICE_PROVIDER}
+
+                        **Configuración de Backup:**
+                        * **Hora de Inicio del Backup:** ${params.DB_BACKUP_START_TIME}
+                        * **Días de Retención:** ${params.DB_BACKUP_RETENTION_DAYS}
+
+                        **Enlace de la Build:** [Ver Build en Jenkins](${env.BUILD_URL})
+                        """
+
+
+                        env.mensaje = notificationText
+                }
+            }
+        }
         
 
 
@@ -547,15 +570,17 @@ pipeline {
         stage('Notify Teams') {
             steps {
                 script {
+
                 def teamsWebhookUrl = 'https://accenture.webhook.office.com/webhookb2/870e2ab9-53bf-43f6-8655-376cbe11bd1c@e0793d39-0939-496d-b129-198edd916feb/IncomingWebhook/f495e4cf395c416e83eae4fb3b9069fd/b08cc148-e951-496b-9f46-3f7e35f79570/V2r0-VttaFGsrZXpm8qS18JcqaHZ26SxRAT51CZvkTR-A1'
+
                 def message = """
                 {
                     "@type": "MessageCard",
                     "@context": "http://schema.org/extensions",
                     "summary": "Notificación de Jenkins",
                     "themeColor": "0076D7",
-                    "title": "Despliegue de base de datos iniciado desde Jenkins",
-                    "text": "${env.mensajeAteams}"
+                    "title": "Despliegue de base de datos Oracle iniciado desde Jenkins",
+                    "text": "${env.mensaje}"
                 }
                 """
                 sh """
@@ -566,6 +591,36 @@ pipeline {
                 
                 }
             }
+        }
+
+
+
+        stage('Crear ticket en Jira') {
+        steps {
+            script{
+                withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
+                
+                def proyect = "AJI"
+                def sumary = "Creación de Instacia base de datos Oracle"
+                def issuetype = "14898"
+                
+
+                sh """
+                    curl -X POST "https://bancoripley1.atlassian.net/rest/api/3/issue" \
+                        -H "Authorization: Basic ${auth}" \
+                        -H "Content-Type: application/json" \
+                        -d '{
+                        "fields": {
+                            "project": { "key": "${proyect}" },
+                            "summary": "${sumary}",
+                            "description": "${env.mensaje}",
+                            "issuetype": { "id": "${issuetype}" }
+                            }
+                        }'
+                    """
+            }
+        }
         }
 
     //     stage('Terraform Init') {
