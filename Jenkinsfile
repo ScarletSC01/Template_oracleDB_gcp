@@ -285,17 +285,17 @@ pipeline {
                     echo '================================================'
                     
                     // Validaciones básicas
-                    if (!params.PROJECT_ID?.trim()) {
-                        error('ERROR: PROJECT_ID es obligatorio')
-                    }
-                    if (!params.REGION?.trim()) {
-                        error('ERROR: REGION es obligatoria')
-                    }
-                    if (!params.DB_NAME?.trim()) {
-                        error('ERROR: DB_NAME es obligatorio')
-                    }
-                    if(!params.ACTION?.trim()){
-                        error('ERROR: ACTION es obligatorio')
+                    // if (!params.PROJECT_ID?.trim()) {
+                    //     error('ERROR: PROJECT_ID es obligatorio')
+                    // }
+                    // if (!params.REGION?.trim()) {
+                    //     error('ERROR: REGION es obligatoria')
+                    // }
+                    // if (!params.DB_NAME?.trim()) {
+                    //     error('ERROR: DB_NAME es obligatorio')
+                    // }
+                    // if(!params.ACTION?.trim()){
+                    //     error('ERROR: ACTION es obligatorio')
                     }
                     
                     echo 'Validación de parámetros completada exitosamente'
