@@ -1,4 +1,4 @@
-descriptionpipeline {
+pipeline {
     agent any
     
     environment {
@@ -284,19 +284,19 @@ descriptionpipeline {
                     echo '         VALIDACIÓN DE PARÁMETROS              '
                     echo '================================================'
                     
-                    // Validaciones básicas
-                    if (!params.PROJECT_ID?.trim()) {
-                        error('ERROR: PROJECT_ID es obligatorio')
-                    }
-                    if (!params.REGION?.trim()) {
-                        error('ERROR: REGION es obligatoria')
-                    }
-                    if (!params.DB_NAME?.trim()) {
-                        error('ERROR: DB_NAME es obligatorio')
-                    }
-                    if(!params.ACTION?.trim()){
-                        error('ERROR: ACTION es obligatorio')
-                    }
+                    // // Validaciones básicas
+                    // if (!params.PROJECT_ID?.trim()) {
+                    //     error('ERROR: PROJECT_ID es obligatorio')
+                    // }
+                    // if (!params.REGION?.trim()) {
+                    //     error('ERROR: REGION es obligatoria')
+                    // }
+                    // if (!params.DB_NAME?.trim()) {
+                    //     error('ERROR: DB_NAME es obligatorio')
+                    // }
+                    // if(!params.ACTION?.trim()){
+                    //     error('ERROR: ACTION es obligatorio')
+                    // }
                     
                     echo 'Validación de parámetros completada exitosamente'
                 }
@@ -584,44 +584,44 @@ descriptionpipeline {
     
 
 
-    stage('Crear ticket en Jira') {
-        steps {
-            script {
-                withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
-                    def auth = "${JIRA_USER}:${JIRA_API_TOKEN}".bytes.encodeBase64().toString()
-                    
-                    def proyect = "AJI"
-                    def sumary = "Creación de Instancia base de datos Oracle"
-                    def issuetype = "14898"
-                    
-                    // Construir el payload como mapa
-                    def payloadMap = {
-                        fields: {
-                            project: { key: proyect },
-                            summary: sumary,
-                            description: "prueba",
-                            issuetype: { id: issuetype }
-                        }
+        stage('Crear ticket en Jira') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                        def auth = "${JIRA_USER}:${JIRA_API_TOKEN}".bytes.encodeBase64().toString()
+                        
+                        def proyect = "AJI"
+                        def sumary = "Creación de Instancia base de datos Oracle"
+                        def issuetype = "14898"
+                        
+                        // Construir el payload como mapa
+                        def payloadMap = [
+                            fields: [
+                                project: [ key: proyect ],
+                                summary: sumary,
+                                description: "Descripción disponible",
+                                issuetype: [ id: issuetype ]
+                            ]
+                        ]
+                        
+                        // Convertir a JSON válido
+                        def payloadJson = groovy.json.JsonOutput.toJson(payloadMap)
+                        
+                        def response = sh(
+                            script: """
+                            curl -s -X POST "${JIRA_API_URL}" \\
+                                -H "Authorization: Basic ${auth}" \\
+                                -H "Content-Type: application/json" \\
+                                -d '${payloadJson}'
+                            """,
+                            returnStdout: true
+                        ).trim()
+                        
+                        echo "Comentario enviado: ${response}"
                     }
-                    
-                    // Convertir a JSON válido
-                    def payloadJson = groovy.json.JsonOutput.toJson(payloadMap)
-                    
-                    def response = sh(
-                        script: """
-                        curl -s -X POST "${JIRA_API_URL}" \\
-                            -H "Authorization: Basic ${auth}" \\
-                            -H "Content-Type: application/json" \\
-                            -d '${payloadJson}'
-                        """,
-                        returnStdout: true
-                    ).trim()
-                    
-                    echo "Comentario enviado: ${response}"
                 }
             }
         }
-    }
 
     //     stage('Terraform Init') {
     //         steps {
