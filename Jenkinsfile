@@ -1,4 +1,4 @@
-pipeline {
+descriptionpipeline {
     agent any
     
     environment {
@@ -595,14 +595,14 @@ pipeline {
                     def issuetype = "14898"
                     
                     // Construir el payload como mapa
-                    def payloadMap = [
-                        fields: [
-                            project: [ key: proyect ],
+                    def payloadMap = {
+                        fields: {
+                            project: { key: proyect },
                             summary: sumary,
                             description: "prueba",
-                            issuetype: [ id: issuetype ]
-                        ]
-                    ]
+                            issuetype: { id: issuetype }
+                        }
+                    }
                     
                     // Convertir a JSON válido
                     def payloadJson = groovy.json.JsonOutput.toJson(payloadMap)
