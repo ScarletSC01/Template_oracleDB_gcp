@@ -284,19 +284,19 @@ pipeline {
                     echo '         VALIDACIÓN DE PARÁMETROS              '
                     echo '================================================'
                     
-                    // // Validaciones básicas
-                    // if (!params.PROJECT_ID?.trim()) {
-                    //     error('ERROR: PROJECT_ID es obligatorio')
-                    // }
-                    // if (!params.REGION?.trim()) {
-                    //     error('ERROR: REGION es obligatoria')
-                    // }
-                    // if (!params.DB_NAME?.trim()) {
-                    //     error('ERROR: DB_NAME es obligatorio')
-                    // }
-                    // if(!params.ACTION?.trim()){
-                    //     error('ERROR: ACTION es obligatorio')
-                    // }
+                    // Validaciones básicas
+                    if (!params.PROJECT_ID?.trim()) {
+                        error('ERROR: PROJECT_ID es obligatorio')
+                    }
+                    if (!params.REGION?.trim()) {
+                        error('ERROR: REGION es obligatoria')
+                    }
+                    if (!params.DB_NAME?.trim()) {
+                        error('ERROR: DB_NAME es obligatorio')
+                    }
+                    if(!params.ACTION?.trim()){
+                        error('ERROR: ACTION es obligatorio')
+                    }
                     
                     echo 'Validación de parámetros completada exitosamente'
                 }
@@ -583,54 +583,46 @@ pipeline {
 
     
 
-        stage('Crear ticket en Jira') {
-            steps {
-                script{
-                    withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
-                        def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
-                        
-                        def proyect = "AJI"
-                        def sumary = "Creación de Instacia base de datos Oracle"
-                        def issuetype = "14898"
-                        def payload =  """{
-                                "fields": {
-                                    "project": { 
-                                        "self": "https://bancoripley1.atlassian.net/rest/api/3/project/13212",
-                                        "id": "13212",
-                                        "key": "${proyect}",
-                                        "name": "Accenture J2C Interno",
-                                        "projectTypeKey": "software",
-                                    },
-                                    "summary": "${sumary}",
-                                    "description": "${env.mensaje}",
-                                    "issuetype": { 
-                                        "self": "https://bancoripley1.atlassian.net/rest/api/3/issuetype/14898",
-                                        "id": "${issuetype}",
-                                        "name": "Tarea",
-                                        "avatarId": 10318,
-                                        "entityId": "960bc890-aa67-4d2b-8814-3926d66a6c41",
-                                    }
-                                }
-                            }"""
-                        
-                        
-                        payloadJson = groovy.json.JsonOutput.toJson(payload)
-                        def response = sh(
-                            script: """
-                            curl -s -X POST "${JIRA_API_URL}" \\
-                                -H "Authorization: Basic ${auth}" \\
-                                -H "Content-Type: application/json" \\
-                                -d '${payloadJson}'
-                            """,
-                            returnStdout: true
-                            ).trim()
 
-                            echo "Comentario enviado: ${response}"
-                    }
-            
+    stage('Crear ticket en Jira') {
+        steps {
+            script {
+                withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                    def auth = "${JIRA_USER}:${JIRA_API_TOKEN}".bytes.encodeBase64().toString()
+                    
+                    def proyect = "AJI"
+                    def sumary = "Creación de Instancia base de datos Oracle"
+                    def issuetype = "14898"
+                    
+                    // Construir el payload como mapa
+                    def payloadMap = [
+                        fields: [
+                            project: [ key: proyect ],
+                            summary: sumary,
+                            description: env.mensaje ?: "Descripción no disponible",
+                            issuetype: [ id: issuetype ]
+                        ]
+                    ]
+                    
+                    // Convertir a JSON válido
+                    def payloadJson = groovy.json.JsonOutput.toJson(payloadMap)
+                    
+                    def response = sh(
+                        script: """
+                        curl -s -X POST "${JIRA_API_URL}" \\
+                            -H "Authorization: Basic ${auth}" \\
+                            -H "Content-Type: application/json" \\
+                            -d '${payloadJson}'
+                        """,
+                        returnStdout: true
+                    ).trim()
+                    
+                    echo "Comentario enviado: ${response}"
                 }
             }
-        }    
+        }
+    }
+
     //     stage('Terraform Init') {
     //         steps {
     //             withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDENTIALS}"]) {
