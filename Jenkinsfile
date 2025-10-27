@@ -284,7 +284,7 @@ pipeline {
                     echo '         VALIDACIÓN DE PARÁMETROS              '
                     echo '================================================'
                     
-                    // Validaciones básicas
+                    // // Validaciones básicas
                     // if (!params.PROJECT_ID?.trim()) {
                     //     error('ERROR: PROJECT_ID es obligatorio')
                     // }
@@ -454,18 +454,7 @@ pipeline {
                 script{
                     
                     def notificationText = """
-                        **Pipeline ejecutado**
-
-                        **Detalles de la Instancia:**
-                        * **Instancia DB:** ${params.DB_INSTANCE_NAME}
-                        * **Ambiente:** ${params.ENVIRONMENT}
-                        * **Tipo de Servicio:** ${env.DB_SERVICE_PROVIDER}
-
-                        **Configuración de Backup:**
-                        * **Hora de Inicio del Backup:** ${params.DB_BACKUP_START_TIME}
-                        * **Días de Retención:** ${params.DB_BACKUP_RETENTION_DAYS}
-
-                        **Enlace de la Build:** [Ver Build en Jenkins](${env.BUILD_URL})
+                        **Pipeline ejecutado**\\n\\n**Detalles de la Instancia:**\\n* **Instancia DB:** ${params.DB_INSTANCE_NAME}\\n* **Ambiente:** ${params.ENVIRONMENT}\\n* **Tipo de Servicio:** ${env.DB_SERVICE_PROVIDER}\\n\\n**Configuración de Backup:**\\n* **Hora de Inicio del Backup:** ${params.DB_BACKUP_START_TIME}\\n* **Días de Retención:** ${params.DB_BACKUP_RETENTION_DAYS}\\n\\n**Enlace de la Build:** [Ver Build en Jenkins](${env.BUILD_URL})
                         """
 
 
@@ -617,7 +606,7 @@ pipeline {
                                 "fields": {
                                     "project": { "key": "${proyect}" },
                                     "summary": "${sumary}",
-                                    "description": ${env.mensajeprueba},
+                                    "description": ${env.mensaje},
                                     "issuetype": { 
                                         "self": "https://bancoripley1.atlassian.net/rest/api/3/issuetype/14898",
                                         "id": "${issuetype}" 
