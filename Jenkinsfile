@@ -601,7 +601,13 @@ pipeline {
                                 -H "Content-Type: application/json" \
                                 -d '{
                                 "fields": {
-                                    "project": { "key": "${proyect}" },
+                                    "project": { 
+                                        "self": "https://bancoripley1.atlassian.net/rest/api/3/project/13212",
+                                        "id": "13212",
+                                        "key": "${proyect}",
+                                        "name": "Accenture J2C Interno",
+                                        "projectTypeKey": "software",
+                                    },
                                     "summary": "${sumary}",
                                     "description": "${env.mensaje}",
                                     "issuetype": { 
