@@ -492,47 +492,47 @@ pipeline {
         //     }
         // }
 
-        // stage('Post-Coment-jira'){
-        //     steps{
-        //         script{
+        stage('Post-Coment-jira'){
+            steps{
+                script{
                     
-        //             withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
-        //                 def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
-        //                 def comentario = "Este ticket fue comentario por Lucaneitor"
+                    withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                        def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
+                        def comentario = "Este ticket fue comentario por Lucaneitor"
 
-        //                 def response = sh(
-        //                     script: """
-        //                         curl -s -X POST "${JIRA_API_URL}${params.TICKET_JIRA}/comment" \\
-        //                         -H "Authorization: Basic ${auth}" \\
-        //                         -H "Content-Type: application/json" \\
-        //                         -d '{
-        //                             "body": {
-        //                                 "type": "doc",
-        //                                 "version": 1,
-        //                                 "content": [
-        //                                 {
-        //                                     "type": "paragraph",
-        //                                     "content": [
-        //                                     {
-        //                                         "type": "text",
-        //                                         "text": "${comentario}"
-        //                                     }
-        //                                     ]
-        //                                 }
-        //                                 ]
-        //                             }
-        //                             }
-        //                             '
-        //                     """,
-        //                     returnStdout: true
-        //                 ).trim()
+                        def response = sh(
+                            script: """
+                                curl -s -X POST "${JIRA_API_URL}${params.TICKET_JIRA}/comment" \\
+                                -H "Authorization: Basic ${auth}" \\
+                                -H "Content-Type: application/json" \\
+                                -d '{
+                                    "body": {
+                                        "type": "doc",
+                                        "version": 1,
+                                        "content": [
+                                        {
+                                            "type": "paragraph",
+                                            "content": [
+                                            {
+                                                "type": "text",
+                                                "text": "${comentario}"
+                                            }
+                                            ]
+                                        }
+                                        ]
+                                    }
+                                    }
+                                    '
+                            """,
+                            returnStdout: true
+                        ).trim()
 
-        //                 echo "Comentario enviado: ${response}"
-        //             }
+                        echo "Comentario enviado: ${response}"
+                    }
 
-        //         }
-        //     }
-        // }
+                }
+            }
+        }
 
 
         // stage('Marcar Ticket como Finalizado en Jira') {
@@ -594,14 +594,7 @@ pipeline {
                         def issuetype = "14898"
                         
                         def  field = """
-                        
-                         """
-                        def response = sh(
-                            script: """
-                            curl -s -X POST "${JIRA_API_URL}" \
-                                -H "Authorization: Basic ${auth}" \
-                                -H "Content-Type: application/json" \
-                                -d '{
+                            {
                                 "fields": {
                                     "project": { 
                                         "self": "https://bancoripley1.atlassian.net/rest/api/3/project/13212",
@@ -620,7 +613,15 @@ pipeline {
                                         "entityId": "960bc890-aa67-4d2b-8814-3926d66a6c41",
                                     }
                                 }
-                            }'
+                            }
+                         """
+                         parsejason = groovy.json.JsonOutput.toJson([field])
+                        def response = sh(
+                            script: """
+                            curl -s -X POST "${JIRA_API_URL}" \\
+                                -H "Authorization: Basic ${auth}" \\
+                                -H "Content-Type: application/json" \\
+                                -d '${parsejason}'
                             """,
                             returnStdout: true
                             ).trim()
