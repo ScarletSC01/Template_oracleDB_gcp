@@ -599,7 +599,7 @@ pipeline {
                         fields: [
                             project: [ key: proyect ],
                             summary: sumary,
-                            description: env.mensaje ?: "Descripción no disponible",
+                            description: prueba",
                             issuetype: [ id: issuetype ]
                         ]
                     ]
