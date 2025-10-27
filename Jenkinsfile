@@ -618,12 +618,9 @@ pipeline {
                                     "summary": "${sumary}",
                                     "description": "${env.mensaje}",
                                     "issuetype": { 
-                                        "self": "https://bancoripley1.atlassian.net/rest/api/3/project/13212",
+                                        "self": "https://bancoripley1.atlassian.net/rest/api/3/issuetype/14898",
                                         "id": "${issuetype}" 
-                                        "key": "${proyect}",
-                                        "name": "Accenture J2C Interno",
-                                        "projectTypeKey": "software",
-                                        "simplified": true,
+                                        "name": "Tarea",
                                     }
                                     
                                 }'
