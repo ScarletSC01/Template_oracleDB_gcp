@@ -596,7 +596,7 @@ pipeline {
         //     }
         // }
 
-        stage('Crear ticket en Jira') {
+       stage('Crear ticket en Jira') {
             steps {
                 script{
                     withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
@@ -612,7 +612,7 @@ pipeline {
                             curl -s -X POST "${JIRA_API_URL}" \
                                 -H "Authorization: Basic ${auth}" \
                                 -H "Content-Type: application/json" \
-                                -d '{
+                                -d "{
                                 "fields": {
                                     "project": { "key": "${proyect}" },
                                     "summary": "${sumary}",
@@ -623,7 +623,7 @@ pipeline {
                                         "name": "Tarea",
                                     }
                                     
-                                }'
+                                }"
                             """,
                             returnStdout: true
                             ).trim()
