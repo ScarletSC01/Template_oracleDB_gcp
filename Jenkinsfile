@@ -476,76 +476,36 @@ pipeline {
 
 
        
-        // stage('Post-Jira Status') {
-        //     steps {
+        stage('Post-Jira Status') {
+            steps {
                 
-        //         script {
+                script {
         
 
                        
-        //             withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
-        //                 def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
-        //                 def response = sh(
-        //                     script: """
-        //                         curl -s -X GET '${JIRA_API_URL}${params.TICKET_JIRA}' \\
-        //                         -H "Authorization: Basic ${auth}" \\
-        //                         -H "Accept: application/json"
-        //                     """,
-        //                     returnStdout: true
-        //                 ).trim()
+                    withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                        def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
+                        def response = sh(
+                            script: """
+                                curl -s -X GET '${JIRA_API_URL}${params.TICKET_JIRA}' \\
+                                -H "Authorization: Basic ${auth}" \\
+                                -H "Accept: application/json"
+                            """,
+                            returnStdout: true
+                        ).trim()
                     
-        //                 def json = new groovy.json.JsonSlurper().parseText(response)
-        //                 def estado = json.fields.status.name
-        //                 echo "Estado actual del ticket ${params.TICKET_JIRA}: ${estado}"
-        //             }
+                        def json = new groovy.json.JsonSlurper().parseText(response)
+                        def estado = json.fields.status.name
+                        echo "Estado actual del ticket ${params.TICKET_JIRA}: ${estado}"
+                    }
 
         
-        //         }
+                }
         
-        //     }
-        // }
+            }
+        }
 
-        // stage('Post-Coment-jira'){
-        //     steps{
-        //         script{
-                    
-        //             withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
-        //                 def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
-        //                 def comentario = "Este ticket fue comentario por Lucaneitor"
 
-        //                 def response = sh(
-        //                     script: """
-        //                         curl -s -X POST "${JIRA_API_URL}${params.TICKET_JIRA}/comment" \\
-        //                         -H "Authorization: Basic ${auth}" \\
-        //                         -H "Content-Type: application/json" \\
-        //                         -d '{
-        //                             "body": {
-        //                                 "type": "doc",
-        //                                 "version": 1,
-        //                                 "content": [
-        //                                 {
-        //                                     "type": "paragraph",
-        //                                     "content": [
-        //                                     {
-        //                                         "type": "text",
-        //                                         "text": "${comentario}"
-        //                                     }
-        //                                     ]
-        //                                 }
-        //                                 ]
-        //                             }
-        //                             }
-        //                             '
-        //                     """,
-        //                     returnStdout: true
-        //                 ).trim()
-
-        //                 echo "Comentario enviado: ${response}"
-        //             }
-
-        //         }
-        //     }
-        // }
 
         // stage('Marcar Ticket como Finalizado en Jira') {
         //     steps {
@@ -593,36 +553,82 @@ pipeline {
             }
         }
 
+        stage('Post-Coment-jira'){
+            steps{
+                script{
+                    
+                    withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                        def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
+                        def comentario = "Este ticket fue comentario por Lucaneitor"
 
+                        def response = sh(
+                            script: """
+                                curl -s -X POST "${JIRA_API_URL}${params.TICKET_JIRA}/comment" \\
+                                -H "Authorization: Basic ${auth}" \\
+                                -H "Content-Type: application/json" \\
+                                -d '{
+                                    "body": {
+                                        "type": "doc",
+                                        "version": 1,
+                                        "content": [
+                                        {
+                                            "type": "paragraph",
+                                            "content": [
+                                            {
+                                                "type": "text",
+                                                "text": "${comentario}"
+                                            }
+                                            ]
+                                        }
+                                        ]
+                                    }
+                                    }
+                                    '
+                            """,
+                            returnStdout: true
+                        ).trim()
 
-        stage('Crear ticket en Jira') {
-        steps {
-            script{
-                withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
-                def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
-                
-                def proyect = "AJI"
-                def sumary = "Creación de Instacia base de datos Oracle"
-                def issuetype = "14898"
-                
+                        echo "Comentario enviado: ${response}"
+                    }
 
-                sh """
-                    curl -X POST "https://bancoripley1.atlassian.net/rest/api/3/issue" \
-                        -H "Authorization: Basic ${auth}" \
-                        -H "Content-Type: application/json" \
-                        -d '{
-                        "fields": {
-                            "project": { "key": "${proyect}" },
-                            "summary": "${sumary}",
-                            "description": "${env.mensaje}",
-                            "issuetype": { "id": "${issuetype}" }
-                            }
-                        }'
-                    """
+                }
             }
         }
-        }
 
+        stage('Crear ticket en Jira') {
+            steps {
+                script{
+                    withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                        def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
+                        
+                        def proyect = "AJI"
+                        def sumary = "Creación de Instacia base de datos Oracle"
+                        def issuetype = "14898"
+                        
+
+                        def response = sh(
+                            sh """
+                            curl -X POST "${JIRA_API_URL}" \
+                                -H "Authorization: Basic ${auth}" \
+                                -H "Content-Type: application/json" \
+                                -d '{
+                                "fields": {
+                                    "project": { "key": "${proyect}" },
+                                    "summary": "${sumary}",
+                                    "description": "${env.mensaje}",
+                                    "issuetype": { "id": "${issuetype}" }
+                                    }
+                                }'
+                            """,
+                            returnStdout: true
+                            ).trim()
+
+                            echo "Comentario enviado: ${response}"
+                    }
+            
+                }
+            }
+        }    
     //     stage('Terraform Init') {
     //         steps {
     //             withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDENTIALS}"]) {
