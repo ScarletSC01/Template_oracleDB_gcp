@@ -506,6 +506,47 @@ pipeline {
         //     }
         // }
 
+        // stage('Post-Coment-jira'){
+        //     steps{
+        //         script{
+                    
+        //             withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+        //                 def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
+        //                 def comentario = "Este ticket fue comentario por Lucaneitor"
+
+        //                 def response = sh(
+        //                     script: """
+        //                         curl -s -X POST "${JIRA_API_URL}${params.TICKET_JIRA}/comment" \\
+        //                         -H "Authorization: Basic ${auth}" \\
+        //                         -H "Content-Type: application/json" \\
+        //                         -d '{
+        //                             "body": {
+        //                                 "type": "doc",
+        //                                 "version": 1,
+        //                                 "content": [
+        //                                 {
+        //                                     "type": "paragraph",
+        //                                     "content": [
+        //                                     {
+        //                                         "type": "text",
+        //                                         "text": "${comentario}"
+        //                                     }
+        //                                     ]
+        //                                 }
+        //                                 ]
+        //                             }
+        //                             }
+        //                             '
+        //                     """,
+        //                     returnStdout: true
+        //                 ).trim()
+
+        //                 echo "Comentario enviado: ${response}"
+        //             }
+
+        //         }
+        //     }
+        // }
 
 
         // stage('Marcar Ticket como Finalizado en Jira') {
@@ -554,49 +595,9 @@ pipeline {
         //     }
         // }
 
-        // stage('Post-Coment-jira'){
-        //     steps{
-        //         script{
-                    
-        //             withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
-        //                 def auth = java.util.Base64.encoder.encodeToString("${JIRA_USER}:${JIRA_API_TOKEN}".getBytes("UTF-8"))
-        //                 def comentario = "Este ticket fue comentario por Lucaneitor"
+    
 
-        //                 def response = sh(
-        //                     script: """
-        //                         curl -s -X POST "${JIRA_API_URL}${params.TICKET_JIRA}/comment" \\
-        //                         -H "Authorization: Basic ${auth}" \\
-        //                         -H "Content-Type: application/json" \\
-        //                         -d '{
-        //                             "body": {
-        //                                 "type": "doc",
-        //                                 "version": 1,
-        //                                 "content": [
-        //                                 {
-        //                                     "type": "paragraph",
-        //                                     "content": [
-        //                                     {
-        //                                         "type": "text",
-        //                                         "text": "${comentario}"
-        //                                     }
-        //                                     ]
-        //                                 }
-        //                                 ]
-        //                             }
-        //                             }
-        //                             '
-        //                     """,
-        //                     returnStdout: true
-        //                 ).trim()
-
-        //                 echo "Comentario enviado: ${response}"
-        //             }
-
-        //         }
-        //     }
-        // }
-
-       stage('Crear ticket en Jira') {
+        stage('Crear ticket en Jira') {
             steps {
                 script{
                     withCredentials([usernamePassword(credentialsId: 'JIRA_TOKEN', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
@@ -612,18 +613,18 @@ pipeline {
                             curl -s -X POST "${JIRA_API_URL}" \
                                 -H "Authorization: Basic ${auth}" \
                                 -H "Content-Type: application/json" \
-                                -d "{
+                                -d '{
                                 "fields": {
                                     "project": { "key": "${proyect}" },
                                     "summary": "${sumary}",
-                                    "description": "${env.mensaje}",
+                                    "description": ${env.mensaje},
                                     "issuetype": { 
                                         "self": "https://bancoripley1.atlassian.net/rest/api/3/issuetype/14898",
                                         "id": "${issuetype}" 
                                         "name": "Tarea",
                                     }
                                     
-                                }"
+                                }'
                             """,
                             returnStdout: true
                             ).trim()
